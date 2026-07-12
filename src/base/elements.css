@@ -243,6 +243,13 @@
     }
     select::picker-icon {
       color: var(--muted);
+      /* The UA icon is a full-field-height flex item, so its box centre — the
+         rotate origin — sits below the chevron and the flip swings around a
+         point outside it. Give it a glyph-sized box, centred in the field, so
+         it pivots on the chevron regardless of how the UA places the glyph. */
+      block-size: 1em;
+      align-self: center;
+      transform-origin: center;
       transition: transform var(--dur) var(--ease-hikari);
     }
     select:open::picker-icon {
