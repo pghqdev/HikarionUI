@@ -15,22 +15,26 @@
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
 
-    /* Resting (closed) state — the enter transition lands here. */
+    /* Resting (closed) state — the enter transition lands here. A subtle
+       scale-pop, not a vertical drift: a large surface sliding in on the
+       settle-tail easing reads as sluggish, a quick scale reads as instant.
+       ponytail: 0.11s beats --dur (0.16s) here — big surfaces feel slower at
+       the same duration; bump toward --dur if it ever reads as abrupt. */
     opacity: 0;
-    translate: 0 0.5rem;
-    transition: opacity var(--dur) var(--ease-hikari),
-                translate var(--dur) var(--ease-hikari),
-                overlay var(--dur) allow-discrete,
-                display var(--dur) allow-discrete;
+    scale: 0.97;
+    transition: opacity 0.11s var(--ease-hikari),
+                scale 0.11s var(--ease-hikari),
+                overlay 0.11s allow-discrete,
+                display 0.11s allow-discrete;
   }
 
   dialog:modal {
     opacity: 1;
-    translate: 0 0;
+    scale: 1;
   }
 
   @starting-style {
-    dialog:modal { opacity: 0; translate: 0 0.5rem; }
+    dialog:modal { opacity: 0; scale: 0.97; }
   }
 
   /* Neutral scrim — a flat dim, never an accent glow. Same in both themes. */
@@ -38,9 +42,9 @@
     background: color-mix(in oklch, black 42%, transparent);
     backdrop-filter: blur(2px);
     opacity: 0;
-    transition: opacity var(--dur) var(--ease-hikari),
-                overlay var(--dur) allow-discrete,
-                display var(--dur) allow-discrete;
+    transition: opacity 0.11s var(--ease-hikari),
+                overlay 0.11s allow-discrete,
+                display 0.11s allow-discrete;
   }
   dialog:modal::backdrop { opacity: 1; }
   @starting-style {
