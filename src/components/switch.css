@@ -8,9 +8,15 @@
    accent. The thumb slides on `--ease-hikarion`, gated by the global
    reduced-motion killswitch in reset.css.
 
+   Add `role="switch"`: the control looks and behaves like an on/off switch, so
+   it should be announced as one rather than as a checked/unchecked checkbox
+   (ARIA Authoring Practices, Switch). CSS cannot add a role, so this is part of
+   the markup contract, not something the framework can fix for you. Everything
+   else stays native — Space toggles, `:checked` drives the fill.
+
    Markup:
-     <input type="checkbox" data-switch>                  <!-- accent -->
-     <input type="checkbox" data-switch data-variant="danger">  <!-- destructive -->
+     <input type="checkbox" role="switch" data-switch>                 <!-- accent -->
+     <input type="checkbox" role="switch" data-switch data-variant="danger">
    Pair with a `<label for>` as the control's accessible name. The switch is
    inline-block so it sits next to its label text. */
 

@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build the release from
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install
+        run: bun install
+
+      - name: Install Playwright Chromium
+        run: bunx playwright install --with-deps chromium
+
+      - name: Full quality gate (typecheck, tests, contrast, lint, build, size, a11y)
+        run: bun run ci
+
+      # The build regenerates docs/cdn.md from the bytes it just produced.
+      # A diff here means the committed integrity hashes are stale.
+      - name: Integrity hashes are current
+        run: git diff --exit-code docs/cdn.md
+
+      - name: Publish release with artifacts + source maps
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ inputs.tag || github.ref_name }}" \
+            --title "${{ inputs.tag || github.ref_name }}" \
+            --notes-file CHANGELOG.md \
+            dist/hikarion.css \
+            dist/hikarion.css.map \
+            dist/hikarion.min.css \
+            dist/hikarion.min.css.map \
+            dist/hikarion.js \
+            dist/themes/*.min.css \
+            docs/cdn.md

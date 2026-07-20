@@ -1,0 +1,58 @@
+/* Elevation 0–4 — one material ladder, crisp rather than diffuse.
+
+   Every rung is a tight contact shadow (blur ≈ offset, negative spread) plus a
+   single ambient layer that grows with height. The blur stays small on purpose:
+   a wide soft blur reads as fog and dissolves the edge that makes a surface look
+   like a physical sheet sitting above the page.
+
+   The ink is --shadow-color, already mixed per theme from the local accent, so
+   the whole ladder re-lights on a theme swap instead of turning into grey smear.
+   Redeclared on [data-theme] for the same reason tokens.css does: a custom
+   property substitutes where it is declared, so a nested theme must recompute.
+
+   The rungs mean material, not just size:
+     0 flush    — in the page. The hairline border does all the separating.
+     1 raised   — attached to the page: cards, fields, resting buttons.
+     2 lifted   — picked up under the pointer: hover, press-adjacent surfaces.
+     3 floating — off the page entirely: dropdowns, tooltips.
+     4 overlay  — above everything: dialogs, toasts.
+
+   --shadow-sm / --shadow / --shadow-lg stay, now aliased onto rungs 1, 2 and 4,
+   so every existing component lands on the ladder with no edit. Components adopt
+   --elevation-* directly as they are touched.
+   ponytail: no rung 5 — nothing sits above an overlay. */
+
+@layer hikarion {
+  :root,
+  [data-theme] {
+    /* Two inks, not five: the contact layer defines the edge, the ambient layer
+       carries the height. Height is expressed by geometry alone. */
+    --_elev-contact: color-mix(in oklch, var(--shadow-color), transparent 88%);
+    --_elev-ambient: color-mix(in oklch, var(--shadow-color), transparent 92%);
+
+    --elevation-0: none;
+    --elevation-1: 0 1px 1px -1px var(--_elev-contact),
+                   0 1px 2px -1px var(--_elev-ambient);
+    --elevation-2: 0 1px 1px -1px var(--_elev-contact),
+                   0 3px 5px -3px var(--_elev-ambient);
+    --elevation-3: 0 1px 1px -1px var(--_elev-contact),
+                   0 8px 14px -8px var(--_elev-ambient);
+    --elevation-4: 0 2px 2px -1px var(--_elev-contact),
+                   0 20px 32px -16px var(--_elev-ambient);
+
+    --shadow-sm: var(--elevation-1);
+    --shadow: var(--elevation-2);
+    --shadow-lg: var(--elevation-4);
+  }
+
+  /* Under a contrast request the ladder can't rely on a faint gradient to read
+     as depth, so the same geometry gets denser ink. Only the two inks move —
+     the rungs recompute from them. */
+  @media (prefers-contrast: more) {
+    :root,
+    [data-theme] {
+      --_elev-contact: color-mix(in oklch, var(--shadow-color), transparent 74%);
+      --_elev-ambient: color-mix(in oklch, var(--shadow-color), transparent 84%);
+    }
+  }
+}

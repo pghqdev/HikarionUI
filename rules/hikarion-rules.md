@@ -121,6 +121,30 @@ A filter/input token. Chips carry **selection, not tone** — no `data-variant`.
 With `hikarion.js`, clicking a filter chip toggles `aria-pressed`; a
 `data-chip-remove` button removes its chip.
 
+### Avatar
+A round identity token — `[data-avatar]`. Holds an `<img>`, or its own text as
+initials when there is no image. No JS.
+```html
+<span data-avatar>AL</span>
+<span data-avatar><img src="ada.jpg" alt="Ada Lovelace"></span>
+<span data-avatar data-variant="success">+3</span>
+```
+Neutral by default; `data-variant="<tone> [solid]"` tints or fills it, same
+grammar as a badge. There is no image-load fallback: if you have no picture,
+omit the `<img>` and the initials show.
+
+Stack avatars with `[data-avatar-group]`:
+```html
+<div data-avatar-group>
+  <span data-avatar><img src="ada.jpg" alt="Ada Lovelace"></span>
+  <span data-avatar>GH</span>
+  <span data-avatar data-variant="accent">+3</span>
+</div>
+```
+They overlap by a third of their diameter and ring themselves in `--bg`, so the
+overlap retunes with density along with the circle. There is no size knob — the
+framework has no size vocabulary; restyle with your own CSS if you need one.
+
 ### Alert
 A callout. The ARIA role is an independent a11y choice from the tone.
 ```html
@@ -219,30 +243,75 @@ Native gauge and computed-value elements are styled too:
 
 <input type="file">                     <!-- styled as a quiet dashed surface -->
 ```
-`<progress>` and `<meter>` fill with the accent; `<meter>` regions tint via
-the status tones (optimum→success, low/high→warning, suboptimum→danger).
-`<output>` reads as a small monospaced value. All ride the same focus and
-reduced-motion rules as the other fields.
+`<progress>` and `<meter>` fill with the accent; `data-variant` recolours a
+`<progress>` fill (a bar fill is always the flat tone, so the `solid` word is
+accepted and ignored). `<meter>` regions tint via the status tones
+(optimum→success, low/high→warning, suboptimum→danger). `<output>` reads as a
+small monospaced value. Track height follows density. All ride the same focus
+and reduced-motion rules as the other fields.
+
+### Form layout
+Vertical rhythm is hook-free. A `<p>` is the field group — label, control and an
+optional `<small>` hint are all phrasing content, so they are valid inside one.
+`<form>` and `<fieldset>` space their groups; `<legend>` keeps cutting the
+fieldset border because neither container becomes a flex box.
+```html
+<form>
+  <p>
+    <label for="email">Email</label>
+    <input id="email" type="email" required>
+    <small>We never share it.</small>
+  </p>
+  <fieldset>
+    <legend>Shipping</legend>
+    <div data-form-row>
+      <p><label for="city">City</label><input id="city"></p>
+      <p><label for="zip">ZIP</label><input id="zip"></p>
+    </div>
+  </fieldset>
+  <footer data-form-row>
+    <button type="submit" data-variant="solid">Save</button>
+    <button type="reset">Reset</button>
+  </footer>
+</form>
+```
+`data-form-row` puts children side by side and wraps them when there is no room.
+`<p>` groups inside it share the free inline space and drop to their own line
+below ~12rem; anything else — a submit button beside an input — keeps its
+intrinsic width and aligns to the row's bottom edge. Use
+`<footer data-form-row>` for the action row.
+
+Density tightens the gaps between and inside groups. It does **not** shrink the
+wrap threshold: Compact fits more fields per row, it never makes a single field
+narrower than it is legible.
+
+Do not wrap a group in a `<div>` to get spacing, and do not add a hook for the
+column stack — `<form>` and `<fieldset>` already are the stack.
 
 ### File dropzone
-A drag-and-drop upload surface — `label[data-dropzone]` wrapping a hidden
+A drag-and-drop upload surface — `label[data-dropzone]` wrapping an
 `input[type="file"]`. `hikarion.js` adds drag-over highlight and writes the
 chosen filename into a `[data-dropzone-filename]` slot.
 ```html
 <label data-dropzone>
-  <input type="file" hidden>
+  <input type="file">
   <span data-dropzone-filename>Drop files here or click to browse</span>
 </label>
 ```
-CSS-only without JS (the dashed surface + native picker still work); the JS is
-purely the drag-over highlight and filename display.
+Never put `hidden` on that input — it drops out of the tab order and the a11y
+tree, and the dropzone becomes mouse-only. Hikarion stretches the input over the
+card and makes it invisible instead, so it stays focusable. Usable without JS:
+click and keyboard both go to the native input; the JS is purely the drag-over
+highlight and filename display.
 
 ### Switch
 A binary on/off toggle — distinct from a checkbox. `<input type="checkbox"
-data-switch>` with a `<label for>` for the accessible name.
+role="switch" data-switch>` with a `<label for>` for the accessible name.
+`role="switch"` is required: without it the control is announced as a checkbox,
+which is not what it looks like or means.
 ```html
-<label for="notify"><input id="notify" type="checkbox" data-switch checked> Notifications</label>
-<label for="del"><input id="del" type="checkbox" data-switch data-variant="danger" checked> Destructive</label>
+<label for="notify"><input id="notify" type="checkbox" role="switch" data-switch checked> Notifications</label>
+<label for="del"><input id="del" type="checkbox" role="switch" data-switch data-variant="danger" checked> Destructive</label>
 ```
 `data-variant="<tone>"` retints the active track via the tone resolver.
 
@@ -254,6 +323,51 @@ CSS-only loading ring — `[data-spinner]`. No JS; reduced-motion pauses it.
 ```
 Inline next to text or standalone; the ring is the accent (or the active tone
 on a toned ancestor).
+
+Add `role="progressbar"` and it becomes a determinate ring — same hook, no new
+vocabulary, still no JS:
+```html
+<span data-spinner role="progressbar" aria-label="Indexing"
+      aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"
+      style="--hk-value: 62"></span>
+```
+`--hk-value` is the fill percentage (0–100). CSS cannot read a number out of
+`aria-valuenow`, so the value is given twice — once for assistive tech, once for
+the paint. Keep them in sync. Without `role="progressbar"` it is the ordinary
+indeterminate spinner. The ring is masked, so it carries no centre label; put
+the number beside it if it needs to be read.
+
+### Empty state
+A zero-state slot — `[data-empty]`. A centred column: an optional glyph, a
+heading, one muted line of copy, an optional action. Frameless on purpose, so it
+composes inside whatever already frames it; wrap it in `<article>` for the card
+frame.
+```html
+<div data-empty>
+  <span aria-hidden="true">📭</span>
+  <h3>No projects yet</h3>
+  <p>Create your first project and it will show up here.</p>
+  <button data-variant="accent solid">New project</button>
+</div>
+```
+No child hooks — children are styled by tag. The glyph and the padding tighten
+under Compact; the heading and copy do not.
+
+### Skeleton
+A pure-CSS loading placeholder — `[data-skeleton]` on the element that will hold
+the real content. No JS, no size knobs: the placeholder keeps the element's own
+box, so put the hook on a real `<h3>` / `<p>` / `<span>` holding representative
+text and the bar inherits its line height, line count and wrap width. Stacked
+bars get their rhythm from the elements' own margins.
+```html
+<article aria-busy="true">
+  <h3 data-skeleton>Loading title</h3>
+  <p data-skeleton>Loading two lines of body copy that wrap the way the real paragraph will wrap.</p>
+</article>
+```
+Mark the loading region `aria-busy="true"` so assistive tech skips the filler
+text. The sweep recolours per theme; `prefers-reduced-motion` pins it to a flat
+tint, and `forced-colors` swaps in an outline.
 
 ### Stepper
 A multi-step flow indicator — `<ol data-stepper>` of step items. No JS; state
@@ -317,6 +431,52 @@ no `data-density` on a single button. Put it on the container.
 Density tightens **chrome**: spacing, control padding, control type. It leaves
 body copy, headings, and code blocks at full size (dense ≠ harder to read), and
 it leaves the switch at its WCAG 2.2 target-size floor.
+
+## Design foundations
+
+No markup contract here — these are bare tags and framework-internal tokens.
+Nothing in this section adds an attribute to learn.
+
+### Type
+
+Write `h1`–`h6` and stop. The scale escalates at the top (`h1` is fluid, roughly
+1.7x `h2`) and tightens toward body, so a page has one loud voice instead of six
+similar ones. `h5` and `h6` are labels, not sizes: `h5` is a small bold run-in,
+`h6` a tracked-out uppercase eyebrow.
+```html
+<h1>Page title</h1>
+<h2>Section</h2>
+<h6>Eyebrow</h6>
+```
+Type is density-independent. Never reach for a smaller heading level to get a
+smaller size — pick the level the document structure calls for.
+
+### Elevation
+
+Five rungs, `--elevation-0` … `--elevation-4`, each meaning a material state:
+
+| Rung | Meaning | Typical use |
+|------|---------|-------------|
+| 0 | flush — in the page | bordered blocks |
+| 1 | raised — attached | cards, fields, resting buttons |
+| 2 | lifted — under the pointer | hover |
+| 3 | floating — off the page | dropdowns, tooltips |
+| 4 | overlay — above everything | dialogs, toasts |
+
+```html
+<article style="box-shadow: var(--elevation-3)">Floating</article>
+```
+Shadows are crisp, not diffuse: a tight contact layer plus one ambient layer,
+inked from the theme's accent so a theme swap re-lights them. Don't author your
+own `box-shadow` — pick a rung. `--shadow-sm`, `--shadow` and `--shadow-lg`
+remain as aliases for rungs 1, 2 and 4.
+
+### Motion
+
+`--dur` and `--ease-hikarion` are the default pairing. Beside them,
+`--dur-fast` (0.09s) for state flips that must feel instantaneous, and
+`--dur-slow` (0.24s) for travel far enough that instant would read as a
+teleport. All motion is neutralised globally under `prefers-reduced-motion`.
 
 ## Tier-1 tokens
 

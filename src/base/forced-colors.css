@@ -1,0 +1,52 @@
+/* Forced colours — keep *state* legible when the palette is taken away.
+
+   Hikarion expresses "on / selected / current" with the accent: a fill, a soft
+   tint, or a coloured edge. Forced-colours mode replaces every author colour
+   with the user's own pair, so all three collapse into the neighbouring resting
+   state — a checked switch renders byte-identical to an unchecked one. The one
+   thing a forced palette still honours is a system colour keyword, so each
+   selected state is re-stated as Highlight/HighlightText here.
+
+   Deliberately one file rather than a block per component: the failure has a
+   single cause (accent-as-state), so the audit for it should be readable in one
+   place. Imported after the components so each rule wins its tie on source
+   order — every selector below matches its component's exactly. */
+
+@layer hikarion {
+  @media (forced-colors: active) {
+    /* Switch — the track fill is the entire on/off signal. */
+    [data-switch]:checked {
+      background: Highlight;
+    }
+    [data-switch]:checked::after {
+      background: HighlightText;
+    }
+
+    /* Chip — pressed is a tint, and a tint over Canvas is Canvas. */
+    button[data-chip][aria-pressed="true"] {
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    /* Pagination — the current page is a tint plus an accent edge, and every
+       edge is forced to the same colour. */
+    [data-pagination] [aria-current="page"] {
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    /* Tabs — unselected handles carry a *transparent* 2px underline for layout,
+       which forced colours paints in. Blank it out rather than recolouring the
+       selected one: the selected underline is then the only line on the row. */
+    [data-tab-list] button:not([aria-selected="true"]) {
+      border-block-end-color: Canvas;
+    }
+
+    /* Stepper — a completed step still reads (✓ instead of a number), but the
+       active step differs from a pending one by border colour alone. */
+    [data-stepper] > li[aria-current="step"]::after {
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+}

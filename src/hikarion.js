@@ -198,7 +198,15 @@
       el.appendChild(close);
     }
 
-    region.appendChild(el);
+    // Announce, don't just insert: a live region has to be in the DOM *before*
+    // its content changes or the insertion is never announced. The region is
+    // created on first use (and torn down when the last toast leaves), so on
+    // any given call it may be one statement old — hand the append to the next
+    // task so the region is registered first. `removed` guards a dismiss()
+    // that beat the append.
+    setTimeout(() => {
+      if (!removed) region.appendChild(el);
+    });
     if (duration > 0) timer = setTimeout(dismiss, duration);
     return dismiss;
   }

@@ -38,6 +38,9 @@ One `<link>` is the whole install:
 <script src="https://cdn.jsdelivr.net/npm/hikarion-ui@0.1.0/dist/hikarion.js" defer></script>
 ```
 
+Pin a version and add `integrity` for subresource verification — hashes and
+unpkg/theme URLs are in [docs/cdn.md](docs/cdn.md).
+
 Or via npm:
 
 ```sh
@@ -139,8 +142,12 @@ bun run check:a11y  # axe-core against kitchen-sink.html (after build)
 bun run ci          # full quality gate
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for vocabulary/RFC expectations and
-[docs/versioning.md](docs/versioning.md) for SemVer + deprecation policy.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for vocabulary/RFC expectations,
+[docs/versioning.md](docs/versioning.md) for SemVer + deprecation policy, and
+[docs/accessibility.md](docs/accessibility.md) for the keyboard, ARIA and
+no-JavaScript contract (including what genuinely degrades without JS).
+[docs/visual-regression.md](docs/visual-regression.md) covers the screenshot
+baselines and how to update them.
 
 The framework is authored in plain modern CSS partials under `src/`; Lightning
 CSS is the only runtime build dependency and the shipped artifact is

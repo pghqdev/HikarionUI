@@ -91,6 +91,54 @@
       <a href="#">Tab</a> to see the accent focus ring ignite.</p>
     <blockquote>Semantic HTML is the API. Taste is the default; the palette is yours.</blockquote>
 
+    <h2>Type scale</h2>
+    <p>Bare headings, no classes. The scale escalates at the top and tightens toward
+      body, so a page has one loud voice instead of six similar ones;
+      <code>h5</code> and <code>h6</code> stop being sizes and become a run-in label and
+      an eyebrow. Density tightens chrome, never reading matter — the Compact column
+      carries identical type.</p>
+    <div class="grid">
+      <div>
+        <p><code>data-density="crisp"</code></p>
+        <h3>Ship the thing</h3>
+        <h4>A minor heading</h4>
+        <h5>Run-in label</h5>
+        <h6>Eyebrow</h6>
+        <p>Body copy holds at 1rem in both densities. Dense should not mean harder to read.</p>
+        <p><button>Chrome tightens</button></p>
+      </div>
+      <div data-density="compact">
+        <p><code>data-density="compact"</code></p>
+        <h3>Ship the thing</h3>
+        <h4>A minor heading</h4>
+        <h5>Run-in label</h5>
+        <h6>Eyebrow</h6>
+        <p>Body copy holds at 1rem in both densities. Dense should not mean harder to read.</p>
+        <p><button>Chrome tightens</button></p>
+      </div>
+    </div>
+
+    <h2>Elevation</h2>
+    <p>Five rungs, <code>--elevation-0</code> through <code>--elevation-4</code>, each
+      meaning a material state rather than a size. A crisp contact shadow plus one
+      ambient layer, inked from the theme’s accent so a theme swap re-lights the whole
+      ladder. <code>--shadow-sm</code>, <code>--shadow</code> and <code>--shadow-lg</code>
+      alias rungs 1, 2 and 4.</p>
+    <div class="grid">
+      <article style="box-shadow: var(--elevation-0)"><h3>0 — flush</h3><p>In the page. The hairline separates.</p></article>
+      <article style="box-shadow: var(--elevation-1)"><h3>1 — raised</h3><p>Attached: cards, fields, buttons.</p></article>
+      <article style="box-shadow: var(--elevation-2)"><h3>2 — lifted</h3><p>Picked up under the pointer.</p></article>
+      <article style="box-shadow: var(--elevation-3)"><h3>3 — floating</h3><p>Off the page: menus, tooltips.</p></article>
+      <article style="box-shadow: var(--elevation-4)"><h3>4 — overlay</h3><p>Above everything: dialogs, toasts.</p></article>
+    </div>
+    <p>Under <code>data-density="compact"</code> the ladder is unchanged — depth is not a
+      spacing concern; only the card chrome tightens.</p>
+    <div class="grid" data-density="compact">
+      <article style="box-shadow: var(--elevation-0)"><h3>0 — flush</h3><p>In the page. The hairline separates.</p></article>
+      <article style="box-shadow: var(--elevation-2)"><h3>2 — lifted</h3><p>Picked up under the pointer.</p></article>
+      <article style="box-shadow: var(--elevation-4)"><h3>4 — overlay</h3><p>Above everything: dialogs, toasts.</p></article>
+    </div>
+
     <h2>Nav</h2>
     <nav aria-label="Primary">
       <a href="#">Home</a> · <a href="#">Components</a> · <a href="#">Themes</a> · <a href="#">Docs</a>
@@ -250,6 +298,69 @@
       <span data-chip>filter.css <button data-chip-remove aria-label="Remove filter">✕</button></span>
     </div>
 
+    <h2>Avatar</h2>
+    <p><code>data-avatar</code> holds an <code>&lt;img&gt;</code> or, with no image, its own
+      text as initials — no JS fallback dance. <code>data-avatar-group</code> stacks them;
+      Compact shrinks circle, type and overlap from one knob.</p>
+    <div class="row">
+      <span data-avatar>AL</span>
+      <span data-avatar data-variant="success">GH</span>
+      <span data-avatar data-variant="danger solid">KO</span>
+      <span data-avatar><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%236b7fd7'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%23fff'/%3E%3Ccircle cx='20' cy='40' r='13' fill='%23fff'/%3E%3C/svg%3E" alt="Ada Lovelace"></span>
+      <div data-avatar-group>
+        <span data-avatar><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%236b7fd7'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%23fff'/%3E%3Ccircle cx='20' cy='40' r='13' fill='%23fff'/%3E%3C/svg%3E" alt="Ada Lovelace"></span>
+        <span data-avatar>GH</span>
+        <span data-avatar>KO</span>
+        <span data-avatar data-variant="accent">+3</span>
+      </div>
+      <div data-density="compact" data-avatar-group>
+        <span data-avatar>AL</span>
+        <span data-avatar>GH</span>
+        <span data-avatar data-variant="accent">+3</span>
+      </div>
+    </div>
+
+    <h2>Empty state</h2>
+    <p><code>[data-empty]</code> — a frameless zero-state column, so it composes inside
+      whatever already frames it. Wrap it in an <code>&lt;article&gt;</code> for the card frame.
+      Compact tightens the glyph and padding; heading and copy hold their size.</p>
+    <div class="grid">
+      <article>
+        <div data-empty>
+          <span aria-hidden="true">📭</span>
+          <h3>No projects yet</h3>
+          <p>Create your first project and it will show up here.</p>
+          <button data-variant="accent solid">New project</button>
+        </div>
+      </article>
+      <article data-density="compact">
+        <div data-empty>
+          <span aria-hidden="true">🔍</span>
+          <h3>No results</h3>
+          <p>Nothing matched “filter.css”. Try a broader search.</p>
+          <button>Clear filters</button>
+        </div>
+      </article>
+    </div>
+
+    <h2>Skeleton</h2>
+    <p><code>[data-skeleton]</code> — a pure-CSS loading placeholder. The element’s own
+      text sets the bar’s shape, so there is no sizing API. Reduced motion flattens the
+      sweep. Bars don’t shrink under Compact — they stand in for body copy, which doesn’t
+      either; the card padding around them is what tightens.</p>
+    <div class="grid">
+      <article aria-busy="true">
+        <h3 data-skeleton>Loading title</h3>
+        <p data-skeleton>Loading a couple of lines of body copy that wrap exactly the way the real paragraph will wrap once it arrives.</p>
+        <p><span data-skeleton>Loading meta</span></p>
+      </article>
+      <article aria-busy="true" data-density="compact">
+        <h3 data-skeleton>Loading title</h3>
+        <p data-skeleton>Loading a couple of lines of body copy that wrap exactly the way the real paragraph will wrap once it arrives.</p>
+        <p><span data-skeleton>Loading meta</span></p>
+      </article>
+    </div>
+
     <h2>Spinner</h2>
     <p>CSS-only <code>[data-spinner]</code> — a rotating ring in the accent. No JS;
       reduced-motion pauses it. Inline next to text or standalone.</p>
@@ -260,12 +371,14 @@
     </div>
 
     <h2>Switch</h2>
-    <p>A binary toggle — <code>data-switch</code> on a checkbox. Tone-respecting.</p>
+    <p>A binary toggle — <code>data-switch</code> on a checkbox, plus
+      <code>role="switch"</code> so it is announced as on/off rather than
+      checked/unchecked. Tone-respecting.</p>
     <div class="row">
-      <label><input type="checkbox" data-switch checked> Notifications</label>
-      <label><input type="checkbox" data-switch data-variant="danger" checked> Destructive</label>
-      <label><input type="checkbox" data-switch data-variant="success"> Off</label>
-      <label><input type="checkbox" data-switch disabled> Disabled</label>
+      <label><input type="checkbox" role="switch" data-switch checked> Notifications</label>
+      <label><input type="checkbox" role="switch" data-switch data-variant="danger" checked> Destructive</label>
+      <label><input type="checkbox" role="switch" data-switch data-variant="success"> Off</label>
+      <label><input type="checkbox" role="switch" data-switch disabled> Disabled</label>
     </div>
 
     <h2>Dropdown</h2>
@@ -321,7 +434,7 @@
 
     <h2>Form</h2>
     <div class="card">
-      <form onsubmit="return false" class="grid">
+      <form onsubmit="return false">
         <p>
           <label for="name">Name</label>
           <input id="name" type="text" placeholder="Hikarion">
@@ -350,15 +463,87 @@
         <p>
           <label for="drop">Drop a file</label>
           <label data-dropzone>
-            <input id="drop" type="file" hidden>
+            <input id="drop" type="file">
             <span data-dropzone-filename>Drop files here or click to browse</span>
           </label>
         </p>
+        <footer data-form-row>
+          <button type="submit" data-variant="solid">Submit</button>
+          <button type="reset">Reset</button>
+        </footer>
       </form>
-      <div class="row" style="margin-top: var(--space)">
-        <button type="submit" data-variant="solid">Submit</button>
-        <button type="reset">Reset</button>
-      </div>
+    </div>
+
+    <h2>Form layout</h2>
+    <p>No hook for the common case: <code>&lt;form&gt;</code>, <code>&lt;fieldset&gt;</code> and a
+      <code>&lt;p&gt;</code> per field carry the whole vertical rhythm, and
+      <code>&lt;legend&gt;</code> keeps cutting the border. One hook,
+      <code>data-form-row</code>, puts groups side by side.</p>
+    <div class="card">
+      <form onsubmit="return false">
+        <p>
+          <label for="fl-email">Email</label>
+          <input id="fl-email" type="email" required placeholder="you@example.com">
+          <small>Tab away while empty — native <code>:user-invalid</code>, no JS.</small>
+        </p>
+        <fieldset>
+          <legend>Shipping</legend>
+          <div data-form-row>
+            <p>
+              <label for="fl-city">City</label>
+              <input id="fl-city" placeholder="Kyoto">
+            </p>
+            <p>
+              <label for="fl-zip">ZIP</label>
+              <input id="fl-zip" placeholder="600-8216">
+            </p>
+          </div>
+          <p>
+            <label for="fl-country">Country</label>
+            <select id="fl-country"><option>Japan</option><option>Norway</option></select>
+          </p>
+        </fieldset>
+        <div data-form-row>
+          <p>
+            <label for="fl-coupon">Coupon</label>
+            <input id="fl-coupon" placeholder="HIKARI">
+          </p>
+          <button>Apply</button>
+        </div>
+        <footer data-form-row>
+          <button type="submit" data-variant="solid">Save</button>
+          <button type="reset">Reset</button>
+        </footer>
+      </form>
+    </div>
+
+    <p>The same markup under Compact — the gaps tighten, the wrap threshold does not,
+      so more fields fit per row without any one of them getting cramped.</p>
+    <div class="card" data-density="compact">
+      <form onsubmit="return false">
+        <p>
+          <label for="fl-c-email">Email</label>
+          <input id="fl-c-email" type="email" placeholder="you@example.com">
+          <small>Compact keeps hint and body copy at full size.</small>
+        </p>
+        <fieldset>
+          <legend>Shipping</legend>
+          <div data-form-row>
+            <p>
+              <label for="fl-c-city">City</label>
+              <input id="fl-c-city" placeholder="Kyoto">
+            </p>
+            <p>
+              <label for="fl-c-zip">ZIP</label>
+              <input id="fl-c-zip" placeholder="600-8216">
+            </p>
+          </div>
+        </fieldset>
+        <footer data-form-row>
+          <button type="submit" data-variant="solid">Save</button>
+          <button type="reset">Reset</button>
+        </footer>
+      </form>
     </div>
 
     <h2>Progress &amp; meter</h2>
@@ -366,9 +551,29 @@
     <label for="upload">Upload <output for="upload">62%</output></label>
     <progress id="upload" value="62" max="100"></progress>
     <label for="thinking">Thinking…</label>
-    <progress></progress>
+    <progress id="thinking"></progress>
     <label for="disk">Disk usage</label>
     <meter id="disk" value="0.4" min="0" max="1" low="0.66" high="0.85" optimum="0.1"></meter>
+    <label for="deploy">Deploy <output for="deploy">80%</output></label>
+    <progress id="deploy" value="80" max="100" data-variant="success"></progress>
+    <label for="quota">Quota <output for="quota">93%</output></label>
+    <progress id="quota" value="93" max="100" data-variant="danger"></progress>
+    <div data-density="compact">
+      <label for="sync">Sync (compact) <output for="sync">45%</output></label>
+      <progress id="sync" value="45" max="100"></progress>
+    </div>
+
+    <h3>Circular progress</h3>
+    <p>The spinner with <code>role="progressbar"</code> becomes determinate — same hook,
+      no new vocabulary, no JS. <code>--hk-value</code> paints the fill; CSS can’t read a
+      number out of <code>aria-valuenow</code>, so the value is given twice.</p>
+    <div class="row">
+      <span data-spinner role="progressbar" aria-label="Indexing" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="--hk-value: 62"></span>
+      <span data-spinner role="progressbar" aria-label="Uploading" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" data-variant="warning" style="--hk-value: 25"></span>
+      <span data-spinner role="progressbar" aria-label="Backup" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" data-variant="success" style="--hk-value: 100"></span>
+      <span data-density="compact" data-spinner role="progressbar" aria-label="Indexing (compact)" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="--hk-value: 62"></span>
+      <span data-spinner></span>
+    </div>
 
     <h2>Table</h2>
     <table>

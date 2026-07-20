@@ -1,0 +1,89 @@
+/* Form layout — vertical rhythm and side-by-side grouping for native form
+   markup. Almost entirely hook-free: <form>, <fieldset> and the spec-canonical
+   <p> field group (label + control + <small> hint — all phrasing content, all
+   valid in a <p>) already say everything a field group needs to say. One hook,
+   [data-form-row], exists because HTML has no element meaning "these sit side
+   by side"; a <footer data-form-row> is the action row.
+
+   Rhythm is margin-based, not flex gap on the container. Making <fieldset> a
+   flex container pulls <legend> in as an ordinary flex item and it stops
+   cutting the border — the whole reason <fieldset> is worth using.
+
+   Markup:
+     <form>
+       <p>
+         <label for="email">Email</label>
+         <input id="email" type="email">
+         <small>We never share it.</small>
+       </p>
+       <fieldset>
+         <legend>Shipping</legend>
+         <div data-form-row>
+           <p><label for="city">City</label><input id="city"></p>
+           <p><label for="zip">ZIP</label><input id="zip"></p>
+         </div>
+       </fieldset>
+       <footer data-form-row>
+         <button data-variant="solid">Save</button>
+         <button type="reset">Reset</button>
+       </footer>
+     </form> */
+
+@layer hikarion {
+  /* Between groups. A wider step than the intra-group gap below, so the eye
+     resolves "which fields" before "which label goes with which control". */
+  :is(form, fieldset) > :is(p, fieldset, [data-form-row]) {
+    margin-block: var(--space-6);
+  }
+  /* Edges belong to the container's own padding, not to a group's margin. */
+  :is(form, fieldset) > :first-child {
+    margin-block-start: 0;
+  }
+  :is(form, fieldset) > :last-child {
+    margin-block-end: 0;
+  }
+  /* <legend> is never :first-child's sibling by accident — it is always the
+     first thing in a fieldset, so the group after it sits at the padding edge. */
+  legend + :is(p, fieldset, [data-form-row]) {
+    margin-block-start: 0;
+  }
+
+  /* The field group. Column so a control, its label and its hint stack in
+     source order with one rhythm, whatever mix is present. */
+  :is(form, fieldset, [data-form-row]) > p {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+
+    /* <label> carries its own bottom margin for bare use (base/elements.css);
+       inside the group the gap owns that space instead. */
+    & > label {
+      margin-block-end: 0;
+    }
+  }
+
+  /* Side by side. Fields share the free inline space; anything else keeps its
+     intrinsic width. */
+  [data-form-row] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+
+    & > p {
+      /* Basis is a wrap threshold, not chrome — the narrowest a field may get
+         before it drops to its own line. Deliberately NOT scaled by density:
+         compact should fit more fields per row, not squeeze each one below
+         legibility. The gaps around them carry the density instead. */
+      flex: 1 1 12rem;
+      margin-block: 0;
+    }
+
+    /* Field groups stretch, so their labels line up and their controls line up
+       with them. A bare control in the same row (a submit button beside an
+       input) has no label to align to, so it drops to the row's baseline edge
+       rather than stretching to full height. */
+    & > :not(p) {
+      align-self: flex-end;
+    }
+  }
+}

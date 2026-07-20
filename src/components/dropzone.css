@@ -1,7 +1,13 @@
-/* File dropzone — `label[data-dropzone]` wrapping a hidden `input[type="file"]`.
+/* File dropzone — `label[data-dropzone]` wrapping an `input[type="file"]`.
    Renders as a dashed-border card with a prompt; click or drag files onto it to
-   trigger the native picker. The input stays in the a11y tree (screen-reader
-   friendly) but is visually hidden.
+   trigger the native picker.
+
+   Do NOT put `hidden` on the input. `hidden` takes it out of the tab order and
+   out of the a11y tree, which leaves the dropzone reachable by mouse only. The
+   rule below makes it invisible while keeping it a real, focusable control.
+   (A native file input also accepts a dropped file itself, so covering the card
+   with it should make drag-and-drop work with no JS — that follows from the
+   spec but is not covered by a test; synthetic drops can't set `input.files`.)
 
    CSS-only for the visual styling. `hikarion.js` adds the drag-over highlight
    (toggling `[data-dragover]` on the label) and writes the selected filename
@@ -9,12 +15,14 @@
 
    Markup:
      <label data-dropzone>
-       <input type="file" hidden>
+       <input type="file">
        <span data-dropzone-filename>Drop files here or click to browse</span>
      </label> */
 
 @layer hikarion {
   [data-dropzone] {
+    /* Containing block for the invisible input that covers the whole card. */
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -31,6 +39,20 @@
     transition: border-color var(--dur) var(--ease-hikarion),
                 background var(--dur) var(--ease-hikarion),
                 color var(--dur) var(--ease-hikarion);
+  }
+
+  /* The real control, stretched over the card and made invisible — so the
+     focus target, the click target and the drop target are all the whole
+     dropzone, and its target size is the card's rather than an input's. */
+  [data-dropzone] input[type="file"] {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    padding: 0;
+    border: none;
+    opacity: 0;
+    cursor: pointer;
   }
 
   [data-dropzone]:hover {

@@ -1,0 +1,62 @@
+/* Empty state — `[data-empty]`. The zero-state slot: a centred column of an
+   optional glyph, a heading, a muted line of copy, and an optional action.
+
+   Deliberately frameless — no border, no background. An empty state has to
+   compose *inside* whatever already frames it (an <article>, a <td> spanning a
+   table, a tab panel); painting its own surface would double the chrome
+   everywhere it actually gets used. Authors who want a frame wrap it in
+   <article>, which is the card.
+
+   No child hooks: the children are addressed by tag, so the markup stays plain
+   semantic HTML.
+
+   Markup:
+     <div data-empty>
+       <span aria-hidden="true">📭</span>
+       <h3>No projects yet</h3>
+       <p>Create your first project to get started.</p>
+       <button data-variant="accent solid">New project</button>
+     </div> */
+
+@layer hikarion {
+  [data-empty] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding-block: var(--space-8);
+    padding-inline: var(--space-5);
+    text-align: center;
+  }
+
+  /* A leading glyph — emoji, <svg>, or a small <img>. Sized off density
+     because it is chrome, not copy; it dims to --muted so the heading, not the
+     ornament, is the loudest thing here. */
+  [data-empty] > :where(span, svg, img):first-child {
+    display: block;
+    font-size: calc(2.25rem * var(--_density));
+    inline-size: calc(2.25rem * var(--_density));
+    block-size: auto;
+    line-height: 1;
+    color: var(--muted);
+    opacity: 0.7;
+  }
+
+  /* Heading and copy keep their full size in both densities — density
+     tightens chrome, never body copy. */
+  [data-empty] > :where(h1, h2, h3, h4, h5, h6) {
+    margin-block: 0;
+  }
+  [data-empty] > p {
+    margin-block: 0;
+    max-inline-size: 44ch;
+    color: var(--muted);
+  }
+
+  /* The action sits a step further out than the text block, so the copy reads
+     as one unit and the call to action as a separate beat. */
+  [data-empty] > :where(button, a[data-variant], form) {
+    margin-block-start: var(--space-2);
+  }
+}

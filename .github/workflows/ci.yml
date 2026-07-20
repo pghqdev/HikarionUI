@@ -36,8 +36,39 @@ jobs:
       - name: Build
         run: bun run build
 
+      # The build regenerates docs/cdn.md from dist/; a diff means the committed
+      # CDN integrity hashes are stale.
+      - name: Integrity hashes are current
+        run: git diff --exit-code docs/cdn.md
+
       - name: Bundle size budget
         run: bun run check:size
 
       - name: Accessibility (axe-core kitchen-sink)
         run: bun run check:a11y
+
+  # Screenshots are machine-dependent, so this gate runs inside the pinned
+  # Playwright image — the same one that produced the committed baselines.
+  visual:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.61.1-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install
+
+      - name: Build
+        run: bun run build
+
+      - name: Visual regression (kitchen-sink theme × density matrix)
+        env:
+          HIKARION_VISUAL_IN_CONTAINER: "1"
+        run: bun scripts/visual-check.mjs
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-diffs
+          path: tests/visual/*.actual.png

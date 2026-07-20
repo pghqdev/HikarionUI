@@ -1,0 +1,83 @@
+/* Skeleton loader — `[data-skeleton]` on the element that will hold the real
+   content. Pure CSS, no JS, no sizing knobs.
+
+   The trick that removes the whole sizing API: the placeholder keeps the
+   element's own box. Put the hook on a real <h3>/<p>/<span> holding
+   representative text, and the bar inherits that element's line height, line
+   count and wrap width for free — so no --skeleton-lines, no width variants,
+   and stacked bars get their rhythm from the elements' own margins. The text
+   is painted transparent rather than removed so the geometry survives.
+
+   The sweep is one background-position animation over a token-mixed tint, so
+   it recolours per theme. Reduced motion pins it to a flat tint explicitly
+   (the global killswitch only collapses the duration, which would leave the
+   highlight frozen mid-element).
+
+   Markup:
+     <article aria-busy="true">
+       <h3 data-skeleton>Loading title</h3>
+       <p data-skeleton>Loading two lines of body copy that wrap the way the
+         real paragraph will wrap.</p>
+     </article>
+   Mark the loading region `aria-busy="true"` so assistive tech skips the
+   filler text. */
+
+@layer hikarion {
+  [data-skeleton] {
+    --_skeleton-bg: color-mix(in oklch, var(--fg) 9%, var(--surface));
+    --_skeleton-hi: color-mix(in oklch, var(--fg) 16%, var(--surface));
+    /* Transparent, not hidden: the glyphs still lay out, which is what gives
+       the bar its shape. */
+    color: transparent;
+    border-radius: var(--radius-xs);
+    background-color: var(--_skeleton-bg);
+    background-image: linear-gradient(
+      90deg,
+      transparent 35%,
+      var(--_skeleton-hi) 50%,
+      transparent 65%
+    );
+    background-size: 250% 100%;
+    background-repeat: no-repeat;
+    /* 100% parks the highlight at the inline start, 0% at the inline end. */
+    animation: hk-skeleton 1.4s linear infinite;
+    /* Nothing inside is real yet. */
+    pointer-events: none;
+    user-select: none;
+    /* An empty placeholder box (image slot, avatar) still needs a height. */
+    min-block-size: 1em;
+  }
+
+  /* Descendants that set their own colour would paint through the bar. */
+  [data-skeleton] * {
+    color: transparent;
+    visibility: hidden;
+  }
+
+  @keyframes hk-skeleton {
+    from { background-position: 100% 0; }
+    to { background-position: 0 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-skeleton] {
+      animation: none;
+      background-image: none;
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    [data-skeleton] {
+      --_skeleton-bg: color-mix(in oklch, var(--fg) 18%, var(--surface));
+      --_skeleton-hi: color-mix(in oklch, var(--fg) 28%, var(--surface));
+    }
+  }
+
+  /* Forced colours drop the tint entirely, so the placeholder would vanish;
+     an outline keeps the loading shape legible. */
+  @media (forced-colors: active) {
+    [data-skeleton] {
+      outline: 1px solid CanvasText;
+    }
+  }
+}

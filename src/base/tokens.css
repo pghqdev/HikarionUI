@@ -152,10 +152,11 @@
     /* Depth mixed from the local accent, so a theme switch re-lights shadows
        too. Crisp flat lift, not a halo: near-black with a whisper of accent. */
     --shadow-color: color-mix(in oklch, var(--accent) 30%, oklch(18% 0.01 260));
-    --shadow-sm: 0 1px 2px color-mix(in oklch, var(--shadow-color), transparent 95%);
-    --shadow: 0 1px 3px color-mix(in oklch, var(--shadow-color), transparent 94%),
-              0 1px 2px -1px color-mix(in oklch, var(--shadow-color), transparent 95%);
-    --shadow-lg: 0 8px 30px -10px color-mix(in oklch, var(--shadow-color), transparent 88%);
+    /* --shadow-sm / --shadow / --shadow-lg are aliases onto the elevation
+       ladder and live in base/elevation.css, which owns the whole ink recipe.
+       Declaring them here too would re-declare the OLD values on every
+       [data-density] container — beating the inherited aliases locally — so
+       shadows would silently revert inside any Compact region. */
 
     /* The one chevron glyph — select's picker arrow, dropdown trigger, and
        accordion marker all draw this. Components apply it as a mask filled

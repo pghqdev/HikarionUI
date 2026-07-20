@@ -1,0 +1,85 @@
+/* Avatar — [data-avatar], a bare hook. A round identity token holding either
+   an <img> or initials. There is no native element for this, so it earns a
+   hook; the stack earns a second one ([data-avatar-group]) rather than a
+   modifier, matching the chip / chip-remove precedent.
+
+   The fallback is the markup, not a script: the element's text content IS the
+   initials, and an <img> child simply covers it. Omit the <img> and you get
+   initials — no JS onerror dance, no two-element swap.
+
+   One size knob (--_size) drives the circle, the type inside it, and the
+   stack overlap, so density is a single multiplier rather than four
+   correlated literals.
+
+   Markup:
+     <span data-avatar>AL</span>
+     <span data-avatar><img src="ada.jpg" alt="Ada Lovelace"></span>
+     <div data-avatar-group>
+       <span data-avatar><img src="ada.jpg" alt="Ada Lovelace"></span>
+       <span data-avatar>GH</span>
+       <span data-avatar data-variant="success">+3</span>
+     </div> */
+
+@layer hikarion {
+  [data-avatar] {
+    /* Default tone, so a bare data-variant="solid" fills with the accent. */
+    --_tone: var(--accent);
+    --_tone-content: var(--accent-content);
+    --_size: calc(2.5rem * var(--_density));
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    /* Initials must scale with the circle or they spill; one knob, not two. */
+    font-size: calc(var(--_size) * 0.4);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--muted);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* The image covers the initials underneath it. A missing src leaves the alt
+     text visible over them, which is noisy but never blank — the fallback for
+     "no picture" is to omit the <img> entirely. */
+  [data-avatar] > img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  /* Soft — readable ink on the shared tint (not raw tone, which fails AA on
+     light warning/success). */
+  [data-avatar][data-variant] {
+    color: var(--_tone-ink);
+    background: var(--_tint-bg);
+    border-color: var(--_tint-border);
+  }
+  [data-avatar][data-variant~="solid"] {
+    color: var(--_tone-content);
+    background: var(--_tone);
+    border-color: transparent;
+  }
+
+  /* Stack — avatars overlap by a third of their own diameter, so the overlap
+     retunes with density for free. The ring is --bg, not a border, so it cuts
+     the avatar behind without growing the circle. */
+  [data-avatar-group] {
+    display: flex;
+    align-items: center;
+  }
+  [data-avatar-group] > [data-avatar] + [data-avatar] {
+    margin-inline-start: calc(var(--_size) * -0.35);
+    box-shadow: 0 0 0 2px var(--bg);
+  }
+}

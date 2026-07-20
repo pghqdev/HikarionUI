@@ -57,10 +57,10 @@ Out of scope for 1.0 is still ticketed as post-1.0 work (tickets 39–43) so it 
 
 **Blocked by:** Freeze public vocabulary & versioning hygiene
 
-- [ ] CDN usage docs include integrity hashes
-- [ ] GitHub Releases ship minified artifacts and CSS source maps
-- [ ] Optional JS remains a separate entry and core styling never depends on it
-- [ ] Critical/layer subset is either shipped with a clear rationale or explicitly deferred with size budget still green
+- [x] CDN usage docs include integrity hashes
+- [x] GitHub Releases ship minified artifacts and CSS source maps
+- [x] Optional JS remains a separate entry and core styling never depends on it
+- [x] Critical/layer subset is either shipped with a clear rationale or explicitly deferred with size budget still green
 
 ## Accessibility & progressive-enhancement contract for the existing set
 
@@ -68,13 +68,13 @@ Out of scope for 1.0 is still ticketed as post-1.0 work (tickets 39–43) so it 
 
 **Blocked by:** Production CI quality gates
 
-- [ ] Full keyboard support and visible focus for every existing interactive pattern
-- [ ] Custom patterns (tabs, chips, etc.) follow ARIA Authoring Practices where not native
-- [ ] `prefers-reduced-motion`, `prefers-contrast`, and forced-colors are respected
-- [ ] Dialog focus traps and expected focus order are documented
-- [ ] Toasts / dynamic status use appropriate `aria-live` regions
-- [ ] Kitchen-sink passes the automated a11y gate; manual keyboard audit notes exist for each interactive pattern
-- [ ] PE contract is documented and verified: core usable with JS disabled
+- [x] Full keyboard support and visible focus for every existing interactive pattern
+- [x] Custom patterns (tabs, chips, etc.) follow ARIA Authoring Practices where not native
+- [x] `prefers-reduced-motion`, `prefers-contrast`, and forced-colors are respected
+- [x] Dialog focus traps and expected focus order are documented
+- [x] Toasts / dynamic status use appropriate `aria-live` regions
+- [x] Kitchen-sink passes the automated a11y gate; manual keyboard audit notes exist for each interactive pattern
+- [x] PE contract is documented and verified: core usable with JS disabled
 
 ## Visual regression baseline
 
@@ -82,10 +82,10 @@ Out of scope for 1.0 is still ticketed as post-1.0 work (tickets 39–43) so it 
 
 **Blocked by:** Ship Crisp / Compact density as first-class
 
-- [ ] Kitchen-sink is the visual regression baseline
-- [ ] Snapshots (or Chromatic equivalents) cover all shipped themes
-- [ ] Both Crisp and Compact density modes are covered
-- [ ] CI fails on unexpected visual diffs
+- [x] Kitchen-sink is the visual regression baseline
+- [x] Snapshots (or Chromatic equivalents) cover all shipped themes
+- [x] Both Crisp and Compact density modes are covered
+- [x] CI fails on unexpected visual diffs
 
 ## Design-language foundations (type, motion, elevation)
 
@@ -93,10 +93,10 @@ Out of scope for 1.0 is still ticketed as post-1.0 work (tickets 39–43) so it 
 
 **Blocked by:** Ship Crisp / Compact density as first-class
 
-- [ ] Typography scale/hierarchy tokens land and read as product-like, not neutral-default
-- [ ] Motion tokens support short, confident, distinctive easing; decorative motion disables under `prefers-reduced-motion`
-- [ ] Elevation 0–4 has clear material meaning; shadows/borders feel crisp rather than soft-diffused by default
-- [ ] Existing components still render correctly; no big-bang rewrite required for CI to stay green
+- [x] Typography scale/hierarchy tokens land and read as product-like, not neutral-default
+- [x] Motion tokens support short, confident, distinctive easing; decorative motion disables under `prefers-reduced-motion`
+- [x] Elevation 0–4 has clear material meaning; shadows/borders feel crisp rather than soft-diffused by default
+- [x] Existing components still render correctly; no big-bang rewrite required for CI to stay green
 
 ## Empty states + skeleton loaders
 
@@ -104,10 +104,10 @@ Out of scope for 1.0 is still ticketed as post-1.0 work (tickets 39–43) so it 
 
 **Blocked by:** Ship Crisp / Compact density as first-class
 
-- [ ] Consistent empty/zero-state pattern with minimal public vocabulary (ideally ≤ 1–2 new hooks)
-- [ ] Skeleton loaders are pure CSS, token-driven, and respect `prefers-reduced-motion`
-- [ ] Kitchen-sink demonstrates both patterns in Crisp and Compact
-- [ ] Agent rules document the markup contracts
+- [x] Consistent empty/zero-state pattern with minimal public vocabulary (ideally ≤ 1–2 new hooks)
+- [x] Skeleton loaders are pure CSS, token-driven, and respect `prefers-reduced-motion`
+- [x] Kitchen-sink demonstrates both patterns in Crisp and Compact
+- [x] Agent rules document the markup contracts
 
 ## Avatar + progress (linear & circular)
 
@@ -115,10 +115,10 @@ Out of scope for 1.0 is still ticketed as post-1.0 work (tickets 39–43) so it 
 
 **Blocked by:** Ship Crisp / Compact density as first-class
 
-- [ ] Avatar pattern supports image and initials fallback; group pattern is usable
-- [ ] Linear progress uses native `<progress>` styled to the system
-- [ ] Circular progress expands the spinner vocabulary without heavy JS
-- [ ] Kitchen-sink + agent rules cover both densities
+- [x] Avatar pattern supports image and initials fallback; group pattern is usable
+- [x] Linear progress uses native `<progress>` styled to the system
+- [x] Circular progress expands the spinner vocabulary without heavy JS
+- [x] Kitchen-sink + agent rules cover both densities
 
 ## Form layout helpers
 
@@ -126,10 +126,10 @@ Out of scope for 1.0 is still ticketed as post-1.0 work (tickets 39–43) so it 
 
 **Blocked by:** Ship Crisp / Compact density as first-class
 
-- [ ] Fieldset / group / stack patterns exist with a closed, minimal `data-*` surface
-- [ ] Layouts respect both density modes
-- [ ] Kitchen-sink shows common form layouts
-- [ ] Agent rules document the contracts
+- [x] Fieldset / group / stack patterns exist with a closed, minimal `data-*` surface
+- [x] Layouts respect both density modes
+- [x] Kitchen-sink shows common form layouts
+- [x] Agent rules document the contracts
 
 ## High-contrast / forced-colors theme support
 

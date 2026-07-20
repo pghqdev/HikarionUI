@@ -1,4 +1,5 @@
-/* Overlay pop — the one enter/exit recipe for top-layer surfaces (<dialog>
+/* Motion — the shared duration/easing vocabulary, plus the one enter/exit
+   recipe for top-layer surfaces (<dialog>
    modals and [data-menu] popovers). Enter/exit ride @starting-style +
    transition-behavior: allow-discrete — no JS class-toggling.
 
@@ -13,6 +14,23 @@
    at the same duration; bump toward --dur if it ever reads as abrupt. */
 
 @layer hikarion {
+  /* Motion vocabulary, beside --dur / --ease-hikarion rather than replacing
+     them. Two names because there are exactly two jobs --dur doesn't do: a flip
+     that must feel instantaneous, and travel far enough that instant would read
+     as a teleport.
+
+     ponytail: no --ease-pop. An overshoot curve with zero callers in core is a
+     design decision nothing has validated, and it is the one token here that can
+     be actively misapplied — on a dialog-sized surface it reads as wobble, not
+     snap. Add it with the first component that actually wants the bounce.
+
+     No reduced-motion handling here. reset.css already clamps every duration
+     globally with !important, which neutralises all of this. */
+  :root {
+    --dur-fast: 0.09s;
+    --dur-slow: 0.24s;
+  }
+
   :is(dialog, [data-menu]) {
     /* Base = the closed/exit state. */
     opacity: 0;

@@ -5,3 +5,4 @@ dist/
 # Docs site: build cache + assets synced from the framework dist (generated).
 .astro/
 site/public/
+tests/visual/*.actual.png

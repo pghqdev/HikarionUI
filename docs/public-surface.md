@@ -34,6 +34,21 @@ of them.
 | `--font` | UI sans stack |
 | `--mono` | Monospace stack |
 
+## Public derived tokens
+
+Tier-2 tokens are normally internal, but these are named in the agent rules as
+things authors read or set, so they are frozen surface too.
+
+| Token | Role | Direction |
+|-------|------|-----------|
+| `--elevation-0` … `--elevation-4` | The material ladder: flush, raised, lifted, floating, overlay | Read |
+| `--shadow-sm` / `--shadow` / `--shadow-lg` | Aliases for rungs 1, 2 and 4 | Read |
+| `--dur-fast` / `--dur-slow` | Durations beside the Tier-1 `--dur` | Read |
+| `--hk-value` | Fill percentage (0–100) of a `[data-spinner][role="progressbar"]` | Set by the author |
+
+Everything else derived — `--space-*`, `--control-*`, `--text-*`, `--_`-prefixed
+privates — stays internal.
+
 ## Theme containers
 
 | Attribute | Values | Notes |
@@ -56,6 +71,8 @@ grammar, not a separate attribute.
 | Hook | Role |
 |------|------|
 | `data-badge` | Badge |
+| `data-avatar` | Avatar (image or initials) |
+| `data-avatar-group` | Overlapping avatar stack |
 | `data-chip` | Chip (selection, not tone) |
 | `data-chip-remove` | Nested remove control for a chip |
 | `data-tabs` | Tabs root |
@@ -66,7 +83,10 @@ grammar, not a separate attribute.
 | `data-dropzone` | File dropzone on a `<label>` |
 | `data-dropzone-filename` | Filename / prompt slot inside a dropzone |
 | `data-switch` | Switch appearance on a checkbox |
-| `data-spinner` | Loading spinner |
+| `data-spinner` | Loading spinner (with `role="progressbar"`, a determinate ring) |
+| `data-empty` | Empty / zero state |
+| `data-skeleton` | Loading placeholder |
+| `data-form-row` | Side-by-side form field / action row |
 | `data-stepper` | Multi-step flow on `<ol>` |
 | `data-breadcrumbs` | Breadcrumb nav |
 | `data-pagination` | Pagination nav |

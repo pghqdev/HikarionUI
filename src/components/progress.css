@@ -1,0 +1,66 @@
+/* Progress — the native <progress> element for linear, and the existing
+   [data-spinner] ring for circular. No new hook: linear progress is already a
+   real HTML element (styled in base/elements.css), and a determinate ring is
+   the spinner it already is, plus an ARIA state — the same trick alert and
+   stepper use to avoid inventing vocabulary.
+
+   This file adds the three things base/elements.css deliberately left out:
+   density on the track, the tone seam on the fill, and the determinate ring.
+
+   Markup:
+     <progress value="62" max="100"></progress>
+     <progress value="62" max="100" data-variant="success"></progress>
+     <progress></progress>                          <!-- indeterminate -->
+     <span data-spinner role="progressbar" aria-valuenow="62"
+           aria-valuemin="0" aria-valuemax="100" style="--hk-value: 62"></span>
+
+   `--hk-value` (0–100) is the ring's fill. CSS cannot read a number out of
+   aria-valuenow, so the value has to be handed to it twice — once for the
+   accessibility tree, once for the paint. Keep them in sync. */
+
+@layer hikarion {
+  /* Density on the track. base/elements.css sets the geometry at :where()
+     specificity precisely so a single bare-tag rule here can retune it. */
+  progress,
+  meter {
+    block-size: calc(0.625rem * var(--_density));
+  }
+
+  /* Tone on the fill. A bar fill is always the flat tone — there is no soft
+     bar — so this reads --_tone and ignores the `solid` word. The vendor
+     pseudo-elements cannot be grouped: one unknown selector voids the whole
+     rule, so they stay split, as in base/elements.css. */
+  progress[data-variant]::-webkit-progress-value {
+    background: var(--_tone);
+  }
+  progress[data-variant]::-moz-progress-bar {
+    background: var(--_tone);
+  }
+
+  /* Determinate ring — the spinner, stopped and filled to --hk-value. The
+     conic gradient hard-stops from tone to track at the value angle; the
+     donut mask inherited from spinner.css turns it into a ring. The mask
+     clips children too, so a ring carries no centre label — pair it with
+     adjacent text if the number needs to be seen. */
+  [data-spinner][role="progressbar"] {
+    --_size: calc(2.5rem * var(--_density));
+    animation: none;
+    background: conic-gradient(
+      from 0deg,
+      var(--_tone, var(--accent)) calc(var(--hk-value, 0) * 1%),
+      var(--line) 0
+    );
+  }
+
+  @media (forced-colors: active) {
+    /* Gradients are stripped in forced colours, which would leave the ring
+       invisible. Fall back to a plain outlined circle — the value still
+       reaches assistive tech through aria-valuenow. */
+    [data-spinner][role="progressbar"] {
+      -webkit-mask: none;
+      mask: none;
+      background: none;
+      border: 2px solid CanvasText;
+    }
+  }
+}

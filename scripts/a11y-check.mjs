@@ -1,11 +1,11 @@
 // axe-core against kitchen-sink.html. Fails the build on violations.
 // Run after build: bun run check:a11y
-import { createServer } from "node:http";
-import { readFileSync, existsSync } from "node:fs";
-import { extname, join, normalize } from "node:path";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
+import { serveRoot } from "./lib/serve.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const sink = join(root, "kitchen-sink.html");
@@ -16,29 +16,8 @@ if (!existsSync(sink) || !existsSync(distCss)) {
   process.exit(1);
 }
 
-const mime = {
-  ".html": "text/html; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".map": "application/json",
-};
-
-const server = createServer((req, res) => {
-  const urlPath = decodeURIComponent((req.url || "/").split("?")[0]);
-  const rel = urlPath === "/" ? "/kitchen-sink.html" : urlPath;
-  const filePath = normalize(join(root, rel));
-  if (!filePath.startsWith(root) || !existsSync(filePath)) {
-    res.writeHead(404);
-    res.end("not found");
-    return;
-  }
-  res.writeHead(200, { "Content-Type": mime[extname(filePath)] || "application/octet-stream" });
-  res.end(readFileSync(filePath));
-});
-
-await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-const { port } = /** @type {import("node:net").AddressInfo} */ (server.address());
-const url = `http://127.0.0.1:${port}/kitchen-sink.html`;
+const server = await serveRoot(root);
+const url = `${server.origin}/kitchen-sink.html`;
 
 const browser = await chromium.launch({ headless: true });
 // Reduced motion so entrance animations are settled before axe samples colours —

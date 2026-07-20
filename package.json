@@ -48,16 +48,17 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "lightningcss --bundle src/hikarion.css -o dist/hikarion.css && lightningcss --bundle --minify src/hikarion.css -o dist/hikarion.min.css && cp src/hikarion.js dist/hikarion.js && bun scripts/build-themes.mjs && bun scripts/build-rules.mjs",
+    "build": "mkdir -p dist && (cd dist && lightningcss --bundle --sourcemap ../src/hikarion.css -o hikarion.css && lightningcss --bundle --minify --sourcemap ../src/hikarion.css -o hikarion.min.css) && cp src/hikarion.js dist/hikarion.js && bun scripts/build-themes.mjs && bun scripts/build-rules.mjs && bun scripts/cdn-docs.mjs",
     "build:rules": "bun scripts/build-rules.mjs",
     "build:themes": "bun scripts/build-themes.mjs",
     "check": "bun scripts/contrast-check.mjs",
     "check:size": "bun scripts/bundle-size.mjs",
     "check:a11y": "bun scripts/a11y-check.mjs",
+    "check:visual": "bun scripts/visual-check.mjs",
     "lint:css": "stylelint \"src/**/*.css\"",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test",
-    "ci": "bun run typecheck && bun test && bun run check && bun run lint:css && bun run build && bun run check:size && bun run check:a11y",
+    "ci": "bun run typecheck && bun test && bun run check && bun run lint:css && bun run build && bun run check:size && bun run check:a11y && bun run check:visual",
     "prepublishOnly": "bun run ci"
   },
   "publishConfig": {
