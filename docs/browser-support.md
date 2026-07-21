@@ -35,9 +35,10 @@ rules stop losing to your unlayered CSS, so overrides start needing specificity.
 | Container queries | 105 | 16 | 110 | Card media layout, `[data-nav]` stacking | Stacked card and a wrapping horizontal nav — the mobile-first baseline, usable at any width. No `@supports` guard because the fallback *is* the default branch. |
 | `:has()` | 105 | 15.4 | 121 | Card, stepper, table, button group, dropdown trigger | Contextual refinements (trigger chevron, group seams) are skipped; base component styling holds. |
 | Popover API | 114 | 17 | 125 | `[data-menu]`, toast region, hint tooltips | `@supports not selector(:popover-open)` drops `[data-menu]` back into flow as an inline panel under its trigger. Every row still works. |
-| `popover="hint"` | 150 | ✗ | 153 | The conforming, Esc-dismissible tooltip | The attribute selector still matches, so it looks right — but an unknown `popover` value falls back to the **manual** state: `[popovertarget]` still toggles it open and shut (so it is dismissible from the trigger without moving focus), but it is *not* light-dismissed or Esc-closed. Don't promise Esc; a `command="hide-popover"` button inside the bubble is the explicit affordance if you want one. |
+| `popover="hint"` | 150 | ✗ | 153 | The conforming, Esc-dismissible tooltip | The attribute selector still matches, so it looks right — but an unknown `popover` value falls back to the **manual** state: `[popovertarget]` still toggles it open and shut (so it is dismissible from the trigger without moving focus), but it is *not* light-dismissed or Esc-closed. Don't promise Esc from CSS alone — but `hikarion.js` detects the fallback (the reflected `popover` IDL reads back `"manual"`) and adds `Esc` plus outside-click dismissal, so *dismissible* holds anywhere the Popover API exists. |
 | `@starting-style`, `transition-behavior: allow-discrete` | 117 | 17.5 | 129 | Dialog / menu / toast pop-in | Overlays appear and disappear instantly. Nothing moves, nothing breaks. |
 | CSS anchor positioning | 125¹ | 26 | 147 | `[data-menu]` and `popover="hint"` placement | Gated behind `@supports (anchor-name: --x)`. Outside the gate the browser's own centred popover placement is used: detached from the trigger, undramatic, fully usable — every row, Esc, light-dismiss and focus return are the browser's, not ours. |
+| `linear()` easing | 113 | 17.4 | 112 | `--ease-spring` on the switch thumb | Gated behind `@supports (transition-timing-function: linear(0, 1))`; the token stays `--ease-out` and the thumb simply travels without the overshoot. |
 | View Transitions (same-document) | 111 | 18 | 144 | Theme and density cross-fade | The change applies instantly. `Hikarion.setTheme()` feature-detects; no style depends on the API. |
 | Scroll-driven animations (`animation-timeline: scroll()`) | 115 | 26 | ✗² | `[data-scroll-progress]` | Gated behind `@supports`. The bar is **absent**, not stuck or full — that is the point of the guard. |
 | `command` / `commandfor` invokers | 135 | 26.2 | 144 | Opening `<dialog>` from a button; a `[data-menu]` action row closing its own menu | Detected separately from the Popover API — invokers shipped roughly three years later, so a browser can own `popover` fully and still ignore `command`. `hikarion.js` polyfills the invoker click. With neither native support nor the script, a dialog cannot be opened and a menu row does not close its menu (`Esc` and light-dismiss still do) — the one place where no-JS and an old browser compound. Opening a popover never depends on this: `[popovertarget]` is the recommended form and needs neither. |
@@ -62,7 +63,8 @@ their auto-update horizon; the gate is not tightened for them.
 - **Nothing in the enhanced table is load-bearing for content.** Every fallback
   above leaves the markup readable, operable and keyboard-navigable. The two
   states you should actually design around are the hint-tooltip dismissal on
-  Safari and the invoker gap on pre-2025 browsers with JS disabled.
+  Safari *without* `hikarion.js` (the script supplies `Esc` and outside-click
+  there) and the invoker gap on pre-2025 browsers with JS disabled.
 - **Progressive enhancement is tested, not assumed.**
   `tests/progressive-enhancement.test.mjs` drives a real browser with JS off,
   with `hikarion.js` blocked, and under forced colours.

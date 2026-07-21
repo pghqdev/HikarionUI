@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hikarion UI — dashboard composition</title>
+  <script>try{var t=localStorage.getItem("hikarion-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+  <link rel="stylesheet" href="../dist/hikarion.css">
+  <style>
+    /* Page-local layout only — the shell grid and nothing else. Every element
+       inside it is bare or carries a shipped hook. No classes: if a rule here
+       needs one, the composition has drifted off-vocabulary. */
+    body { display: grid; grid-template-columns: minmax(12rem, 15rem) minmax(0, 1fr); min-block-size: 100dvh; }
+    body > nav { position: sticky; top: 0; align-self: start; block-size: 100dvh; overflow-y: auto; }
+    main { padding: calc(var(--space) * 3) calc(var(--space) * 4); max-inline-size: 72rem; }
+    main > header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space); }
+    main > header h1 { margin-block: 0.2em 0; }
+    #stats { display: grid; gap: calc(var(--space) * 2); grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+    #stats article > p { display: flex; align-items: baseline; gap: var(--space); }
+    #stats output { font-size: 1.9rem; }
+    @media (width < 48rem) {
+      body { grid-template-columns: minmax(0, 1fr); }
+      body > nav { position: static; block-size: auto; }
+    }
+  </style>
+</head>
+<body>
+  <nav data-nav="sidebar" aria-label="Primary">
+    <strong>Northwind</strong>
+    <ul>
+      <li><a href="#" aria-current="page">Overview</a></li>
+      <li><a href="#">Deployments</a></li>
+      <li><a href="#">Analytics</a></li>
+      <li><a href="#">Billing</a></li>
+    </ul>
+    <nav aria-label="Account">
+      <ul>
+        <li><a href="#">Team</a></li>
+        <li><a href="settings.html">Settings</a></li>
+      </ul>
+    </nav>
+  </nav>
+
+  <main>
+    <header>
+      <div>
+        <nav data-breadcrumbs aria-label="Breadcrumb">
+          <ol>
+            <li><a href="#">Northwind</a></li>
+            <li><a href="#">Production</a></li>
+            <li><span aria-current="page">Overview</span></li>
+          </ol>
+        </nav>
+        <h1>Overview</h1>
+      </div>
+      <div data-form-row>
+        <button data-set-theme="light">Light</button>
+        <button data-set-theme="dark">Dark</button>
+        <div data-button-group role="group" aria-label="Deploy">
+          <button data-variant="accent solid">Deploy</button>
+          <button data-variant="accent solid" popovertarget="deploy-menu" aria-label="More deploy options"></button>
+          <div popover id="deploy-menu" data-menu>
+            <button commandfor="deploy-menu" command="hide-popover">Deploy preview <kbd>⌘P</kbd></button>
+            <button commandfor="deploy-menu" command="hide-popover">Redeploy last build</button>
+            <hr>
+            <button commandfor="deploy-menu" command="hide-popover" data-variant="danger">Roll back</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div role="status" data-variant="success">
+      <strong>All systems nominal</strong> — last deploy succeeded 6 minutes ago.
+    </div>
+
+    <h2>This week</h2>
+    <section id="stats" aria-label="Key metrics">
+      <article>
+        <h3>Requests</h3>
+        <p><output>1.24M</output> <span data-badge data-variant="success">+12%</span></p>
+        <p>vs. 1.11M the week before.</p>
+      </article>
+      <article>
+        <h3>Error rate</h3>
+        <p><output>0.4%</output> <span data-badge data-variant="warning">+0.1pt</span></p>
+        <p>Mostly 502s from the image resizer.</p>
+      </article>
+      <article>
+        <h3>p95 latency</h3>
+        <p><output>184ms</output> <span data-badge>flat</span></p>
+        <p>Budget is 250ms.</p>
+      </article>
+      <article aria-busy="true">
+        <h3 data-skeleton>Build minutes</h3>
+        <p data-skeleton>Loading a line of copy that wraps the way the real one will.</p>
+      </article>
+    </section>
+
+    <h2>Recent deployments</h2>
+    <p>The table sits in a <code>compact</code> region: dense chrome inside a crisp
+      page is the mode this composition exists to show.</p>
+    <div data-density="compact">
+      <div data-table style="max-block-size: 20rem">
+        <table>
+          <caption>Last 24 hours, newest first</caption>
+          <thead>
+            <tr><th>Select</th><th>Commit</th><th>Author</th><th>Environment</th><th>Status</th><th>Duration</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" aria-label="Select deployment 8f21c0a"></td>
+              <td><code>8f21c0a</code></td>
+              <td><span data-avatar>AL</span> Ada Lovelace</td>
+              <td>Production</td>
+              <td><span data-badge data-variant="success">Ready</span></td>
+              <td>1m 12s</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select deployment 4c9de11"></td>
+              <td><code>4c9de11</code></td>
+              <td><span data-avatar>GH</span> Grace Hopper</td>
+              <td>Preview</td>
+              <td><span data-badge data-variant="warning">Building</span> <span data-spinner></span></td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select deployment 21a77b5"></td>
+              <td><code>21a77b5</code></td>
+              <td><span data-avatar>KJ</span> Katherine Johnson</td>
+              <td>Preview</td>
+              <td><span data-badge data-variant="danger">Failed</span></td>
+              <td>0m 48s</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select deployment b0e4f39"></td>
+              <td><code>b0e4f39</code></td>
+              <td><span data-avatar>ML</span> Margaret Hamilton</td>
+              <td>Production</td>
+              <td><span data-badge data-variant="success">Ready</span></td>
+              <td>1m 05s</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <nav data-pagination aria-label="Deployment pages">
+        <button aria-disabled="true">Prev</button>
+        <a href="#" aria-current="page">1</a>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <span aria-hidden="true">…</span>
+        <a href="#">9</a>
+        <button>Next</button>
+      </nav>
+    </div>
+
+    <h2>Incidents</h2>
+    <article>
+      <div data-empty>
+        <span aria-hidden="true">✓</span>
+        <h3>No open incidents</h3>
+        <p>Alerts land here. The last one closed 19 days ago.</p>
+        <button>View history</button>
+      </div>
+    </article>
+  </main>
+
+  <script src="../dist/hikarion.js" defer></script>
+</body>
+</html>

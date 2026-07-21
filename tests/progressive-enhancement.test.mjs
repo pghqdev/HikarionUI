@@ -99,9 +99,74 @@ describe("progressive enhancement — hikarion.js fails to load", () => {
       expect(await page.locator("pre").first().isVisible()).toBe(true);
     });
   });
+
+  test("no menu roles are claimed without the script", async () => {
+    await withPage({ blockHikarionJs: true }, async (page) => {
+      expect(await page.getAttribute("#menu-demo", "role")).toBe(null);
+    });
+  });
 });
 
 describe("keyboard contract", () => {
+  // The APG model and role="menu" ship together — a menu that announces itself
+  // as one but does not answer arrow keys is worse than the plain disclosure.
+  test("[data-menu] upgrades to an APG menu and arrow keys move between rows", async () => {
+    await withPage({}, async (page) => {
+      await page.click('[popovertarget="menu-demo"]');
+      expect(await page.getAttribute("#menu-demo", "role")).toBe("menu");
+      const focused = () => page.evaluate(() => document.activeElement.textContent.trim());
+      // `toggle` fires in a later task than the click, so focus lands on the
+      // first row a tick after the panel opens — wait for it, don't sleep.
+      await page.waitForFunction(() => document.activeElement?.role === "menuitem");
+      expect(await focused()).toContain("Rename");
+      await page.keyboard.press("ArrowDown");
+      expect(await focused()).toContain("Duplicate");
+      await page.keyboard.press("End");
+      expect(await focused()).toContain("Delete");
+      await page.keyboard.press("ArrowDown"); // wraps
+      expect(await focused()).toContain("Rename");
+      await page.keyboard.press("d"); // typeahead
+      expect(await focused()).toContain("Duplicate");
+      await page.keyboard.press("Tab");
+      expect(await page.evaluate(() => document.getElementById("menu-demo").matches(":popover-open"))).toBe(false);
+      // APG: Tab leaves the menu entirely — past the trigger, not back onto it.
+      expect(
+        await page.evaluate(() => document.activeElement.getAttribute("popovertarget")),
+      ).not.toBe("menu-demo");
+    });
+  });
+
+  test("activating a link row closes the menu", async () => {
+    await withPage({}, async (page) => {
+      await page.click('[popovertarget="menu-demo"]');
+      await page.waitForFunction(() => document.activeElement?.role === "menuitem");
+      await page.keyboard.press("o"); // typeahead to "Open in new tab"
+      await page.keyboard.press("Enter");
+      expect(await page.evaluate(() => document.getElementById("menu-demo").matches(":popover-open"))).toBe(false);
+    });
+  });
+
+  // The comment in hikarion.js tells apps to re-run init() after injecting rows;
+  // that has to actually adopt them, or role="menu" ends up owning a plain button.
+  test("re-running init() adopts rows injected into an upgraded [data-menu]", async () => {
+    await withPage({}, async (page) => {
+      const state = await page.evaluate(() => {
+        const panel = document.getElementById("menu-demo");
+        const row = document.createElement("button");
+        row.textContent = "Archive";
+        panel.appendChild(row);
+        window.Hikarion.init(panel);
+        const rows = [...panel.querySelectorAll("button, a")];
+        return {
+          role: row.getAttribute("role"),
+          tabStops: rows.filter((r) => r.tabIndex === 0).length,
+        };
+      });
+      expect(state.role).toBe("menuitem");
+      expect(state.tabStops).toBe(1);
+    });
+  });
+
   test("modal dialog traps focus and returns it to the invoker", async () => {
     await withPage({}, async (page) => {
       await page.focus('button[commandfor="demo-dialog"]');

@@ -1,6 +1,8 @@
 // hikarion.js — optional, dependency-free progressive enhancement.
-// Helpers: copy buttons on <pre>, tabs wiring, a command-invoker fallback for
-// <dialog> and popovers, theme switch + persistence, toast, chip toggle/remove.
+// Helpers: copy buttons on <pre>, tabs wiring, APG menu keys on [data-menu],
+// Esc/light-dismiss for hint tooltips where `popover="hint"` is unimplemented,
+// a command-invoker fallback for <dialog> and popovers, theme switch +
+// persistence, toast, chip toggle/remove.
 // Hikarion.init(root) re-wires injected markup; it is idempotent. Every helper
 // is also documented as paste-it-yourself vanilla, so the file stays optional.
 //
@@ -86,6 +88,128 @@
 
     // Honour a pre-marked [aria-selected="true"] tab, else the first.
     select(Math.max(0, tabs.findIndex((t) => t.getAttribute("aria-selected") === "true")));
+  }
+
+  // --- Menus: upgrade a [data-menu] disclosure to an APG menu button.
+  // The roles and the keyboard model ship together or not at all — role="menu"
+  // without ↑/↓ lies to a screen reader, so both live here and no-JS keeps the
+  // honest Tab-driven disclosure it already was. Gated on the Popover API too:
+  // without it the panel is static, in flow and permanently visible (see the
+  // @supports fallback in dropdown.css), which is a list of links, not a menu.
+  // ponytail: rows are scanned live on every key, so appended rows just work;
+  // Re-run Hikarion.init() after injecting rows to stamp their roles.
+  function menu(panel) {
+    if (!("togglePopover" in HTMLElement.prototype)) return;
+    const rows = () => [...panel.querySelectorAll("button, a")];
+    const list = rows();
+    if (!list.length) return;
+    // Stamped on every visit, not just the first: init() is the documented way
+    // to adopt injected rows, and a role="menu" may own only menuitems. The
+    // roving tab stop stays where it is — an appended row (default tabIndex 0)
+    // must not become a second tab stop.
+    const stop = list.find((r) => r.getAttribute("role") === "menuitem" && r.tabIndex === 0) ?? list[0];
+    list.forEach((row) => {
+      row.setAttribute("role", "menuitem");
+      row.tabIndex = row === stop ? 0 : -1;
+    });
+    if ("hkMenu" in panel.dataset) return;    // listeners bind once
+    panel.dataset.hkMenu = "";
+    panel.setAttribute("role", "menu");
+    // The trigger is the [popovertarget] button immediately before the panel —
+    // the same relationship dropdown.css draws the chevron from.
+    const trigger = panel.previousElementSibling?.closest?.("[popovertarget]");
+    if (trigger) {
+      trigger.setAttribute("aria-haspopup", "menu");
+      // Enter/Space already open it (it's a button); APG adds the arrows.
+      trigger.addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+        e.preventDefault();
+        panel.showPopover();
+      });
+    }
+
+    const focusRow = (row) => {
+      if (!row) return;
+      rows().forEach((r) => (r.tabIndex = r === row ? 0 : -1));
+      row.focus();
+    };
+
+    // Opening a menu moves focus into it — that is what makes it a menu rather
+    // than a popover you have to Tab into. Esc, light-dismiss and focus return
+    // stay the browser's.
+    panel.addEventListener("toggle", (e) => {
+      if (e.newState === "open") focusRow(rows()[0]);
+    });
+
+    // APG: activating a row closes the menu. The `command="hide-popover"` rows
+    // already do it themselves without the script; links and plain buttons have
+    // no native equivalent, and a click inside a popover is not a light-dismiss,
+    // so a link row would navigate with the menu still hanging open. An
+    // aria-disabled row is inert: it is focusable and announced, not activated.
+    panel.addEventListener("click", (e) => {
+      const row = e.target.closest?.("button, a");
+      if (row && panel.contains(row) && row.getAttribute("aria-disabled") !== "true") panel.hidePopover();
+    });
+
+    panel.addEventListener("keydown", (e) => {
+      // APG: Tab closes the menu and moves focus to the next element in the tab
+      // sequence. The popover's own focus restore lands on the trigger first,
+      // then the un-prevented default tab move continues from there — so focus
+      // ends up after the trigger, which is exactly the APG contract. (Esc
+      // differs: it stops at the trigger.) Not preventDefault'd: nothing is
+      // gained by trapping a key whose whole job is to leave.
+      if (e.key === "Tab") return void panel.hidePopover();
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      const list = rows();
+      const i = list.indexOf(document.activeElement);
+      const step = { ArrowDown: i + 1, ArrowUp: i - 1, Home: 0, End: list.length - 1 }[e.key];
+      if (step !== undefined) {
+        e.preventDefault();
+        return focusRow(list[(step + list.length) % list.length]);
+      }
+      // Typeahead: one printable character jumps to the next row starting with
+      // it, wrapping. ponytail: single character, no multi-key buffer — menu
+      // labels here are short and distinct. Add a timed buffer if they aren't.
+      if (e.key.length !== 1 || e.key === " ") return;
+      const from = i < 0 ? 0 : i + 1;
+      const match = list
+        .slice(from)
+        .concat(list.slice(0, from))
+        .find((r) => r.textContent.trim().toLowerCase().startsWith(e.key.toLowerCase()));
+      if (match) {
+        e.preventDefault();
+        focusRow(match);
+      }
+    });
+  }
+
+  // --- Hint tooltips: give `popover="hint"` its Esc and light-dismiss where
+  // the value itself is unimplemented. An unknown `popover` value falls back to
+  // the *manual* state — visible, toggleable from its invoker, but never
+  // light-dismissed or Esc-closed, which leaves WCAG 2.2 1.4.13 *dismissible*
+  // unmet on every browser without `hint` (no shipping Safari today).
+  // The attribute is not rewritten to "auto": `[popover="hint"]` is the
+  // selector the whole bubble skin is keyed on, and `auto` would also close any
+  // open menu. Two listeners instead of a mutation.
+  function hints() {
+    const probe = document.createElement("div");
+    probe.popover = "hint";
+    // Reflected enumerated attribute: unsupported values read back as "manual".
+    if (probe.popover === "hint" || !("togglePopover" in HTMLElement.prototype)) return;
+    const open = () => [...document.querySelectorAll('[popover="hint"]:popover-open')];
+    document.addEventListener("keydown", (e) => {
+      // No preventDefault: a hint is supplementary, and swallowing Esc would
+      // stop it reaching the <dialog> or menu the user actually meant.
+      if (e.key === "Escape") open().forEach((el) => el.hidePopover());
+    });
+    document.addEventListener("click", (e) => {
+      for (const el of open()) {
+        // Leave the invoker's own click alone — hiding here would race the
+        // native toggle and reopen the bubble the user just dismissed.
+        if (el.contains(e.target) || e.target.closest?.("[popovertarget]")?.popoverTargetElement === el) continue;
+        el.hidePopover();
+      }
+    });
   }
 
   // --- Invoker commands: native `command`/`commandfor` buttons do the work
@@ -345,6 +469,7 @@
     const q = (sel) => [...(root.matches?.(sel) ? [root] : []), ...root.querySelectorAll(sel)];
     q("pre").forEach(decorate);
     q("[data-tabs]").forEach(tabs);
+    q("[data-menu]").forEach(menu);
     q("[data-set-theme]").forEach(themeControl);
     reflect();
   }
@@ -358,6 +483,7 @@
         document.documentElement.dataset.theme = saved;
     } catch {}
     invokerFallback();
+    hints();
     chips();
     dropzones();
     init();

@@ -94,6 +94,10 @@ built-in themes and worth checking on yours:
 - `--accent` clears 4.5:1 on **both** `--bg` and `--surface`, since it is a link
   colour and a border, not only a fill.
 
+Point the gate at your own file to check it: `bun scripts/contrast-check.mjs
+path/to/theme.css`. If you want the theme shipped with Hikarion, the full bar is
+[theming.md](./theming.md).
+
 `prefers-contrast: more` and `forced-colors: active` are handled for you: the
 contrast pass is written in terms of *your* `--fg`. It is the one unlayered
 block in Hikarion, and it has to be: your theme is unlayered too, and unlayered
@@ -136,7 +140,7 @@ Hikarion styles bare tags and its own `data-*` hooks. Both are opt-outable:
 There is no `data-unstyled` escape hatch and no per-component build. The
 published package is one bundled stylesheet; `src/` partials are not exported,
 so you cannot import `components/table.css` alone. If you need that, vendor the
-repo and build it yourself with Lightning CSS — but the whole bundle is ~8.6 kB
+repo and build it yourself with Lightning CSS — but the whole bundle is ~8.7 kB
 gzipped, which is smaller than most escape hatches.
 
 ## If you already have layers

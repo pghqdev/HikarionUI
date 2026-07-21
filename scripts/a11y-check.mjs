@@ -1,6 +1,6 @@
 // axe-core against kitchen-sink.html. Fails the build on violations.
 // Run after build: bun run check:a11y
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
@@ -62,6 +62,27 @@ for (const density of ["crisp", "compact"]) {
       console.error(`  - ${node.target.join(" ")}`);
       if (node.failureSummary) console.error(`    ${node.failureSummary.split("\n")[0]}`);
     }
+  }
+}
+
+// The reference compositions are the pages agents copy, so an a11y defect in one
+// propagates. One pass each, no density loop: dashboard and settings carry a
+// [data-density="compact"] region inline, and the density mechanism itself is
+// gated on kitchen-sink above, which runs the full crisp/compact matrix.
+for (const file of readdirSync(join(root, "compositions")).filter((f) => f.endsWith(".html"))) {
+  await page.goto(`${server.origin}/compositions/${file}`, { waitUntil: "networkidle" });
+  const { violations } = await new AxeBuilder({ page })
+    .options({ rules: { "target-size": { enabled: true } } })
+    .analyze();
+  if (!violations.length) {
+    console.log(`✓ axe-core: no violations on compositions/${file}`);
+    continue;
+  }
+  failed = true;
+  console.error(`✗ axe-core (compositions/${file}): ${violations.length} violation group(s)`);
+  for (const v of violations) {
+    console.error(`\n${v.id} (${v.impact}): ${v.help}`);
+    for (const node of v.nodes.slice(0, 5)) console.error(`  - ${node.target.join(" ")}`);
   }
 }
 

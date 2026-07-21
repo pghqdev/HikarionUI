@@ -300,6 +300,13 @@ the invoker *click* where it is missing; without the script too, a
 ### Dropdown menu
 Native Popover API. The button opens the menu; the browser owns toggle,
 light-dismiss, and focus.
+
+Load `hikarion.js` and the panel becomes a real APG menu: it stamps
+`role="menu"` and `role="menuitem"`, opening moves focus to the first row, and
+`↑` `↓` `Home` `End` plus first-character typeahead move between rows; `Tab` or
+`Esc` closes it. You write nothing extra — the markup below is the whole
+contract. Without the script no roles are claimed and `Tab` walks the rows, so
+the no-JS page is a disclosure, not a broken menu.
 ```html
 <button popovertarget="menu">Actions</button>
 <div id="menu" popover data-menu>
@@ -333,9 +340,6 @@ navigate: leaving the page closes the menu anyway.
   focusable and in the accessibility tree. Do not use the native `disabled`.
 - A trailing `<kbd>` is pushed to the end of the row as a shortcut hint. It is
   decoration: bind the real shortcut yourself.
-
-This is a **disclosure**, not an APG menu — `Tab` moves between rows, not
-`↑`/`↓`, and there is no `role="menu"`.
 
 Placement is CSS anchor positioning against the popover's implicit anchor (its
 invoker), so there is no `anchor-name` wiring per instance. Two fallbacks, both
@@ -391,10 +395,12 @@ element such as a `<span>`.
 ```
 When the trigger must be keyboard-reachable, use a native hint popover instead.
 The trigger is a real button that toggles the bubble, so it is dismissible
-without moving focus. No JS. Esc, light-dismiss and focus return are the
-browser's only where `popover="hint"` is implemented — no shipping Safari has it
+without moving focus. No JS required. Esc, light-dismiss and focus return are
+the browser's where `popover="hint"` is implemented — no shipping Safari has it
 today, and the invalid-value default is the **manual** state (see
-docs/browser-support.md).
+docs/browser-support.md). Loading `hikarion.js` adds Esc and outside-click
+dismissal exactly there, so the hint shape is dismissible everywhere the Popover
+API exists.
 ```html
 <button popovertarget="tip-webhook" aria-label="What is a webhook?">?</button>
 <span popover="hint" id="tip-webhook">A URL we POST to when the event fires</span>
@@ -709,9 +715,17 @@ Spell `crisp` explicitly only to opt a subtree back out of an enclosing
 `compact`. Density is **not** a size variant on individual components — there is
 no `data-density` on a single button. Put it on the container.
 
-Density tightens **chrome**: spacing, control padding, control type. It leaves
-body copy, headings, and code blocks at full size (dense ≠ harder to read), and
-it leaves the switch at its WCAG 2.2 target-size floor.
+Density tightens **chrome**: spacing, control padding, control type, field
+labels, and table column headers. It leaves body copy, headings, and code blocks
+at full size (dense ≠ harder to read), and it leaves interactive targets at the
+WCAG 2.2 §2.5.8 floor — the switch track, the pagination pills and the toast
+close button are the same size in both.
+
+Both densities are first-class. Every component either sits on the density scale
+or says in its own file why it does not, and both are gated by the axe and visual
+checks — so `compact` is a mode the framework was designed in, not a squeeze
+applied to `crisp`. Build a dense admin view in `compact` without checking how it
+looks in `crisp`, and vice versa.
 
 ## Design foundations
 
@@ -873,6 +887,32 @@ stylesheet so the order can't depend on load order.
 Escalate in this order and stop at the first rung that works: change a Tier-1
 token → ship a theme → write a plain unlayered rule → stop using the hook and own
 the element outright.
+
+## Reference compositions
+
+Three whole pages, built only from the vocabulary above, are the ones to copy
+when you need a layout rather than a component:
+
+| Page | Shows |
+|------|-------|
+| [`compositions/dashboard.html`](https://github.com/pghqdev/HikarionUI/blob/main/compositions/dashboard.html) | Sidebar shell, breadcrumbs, split-button menu, stat cards, a `compact` table region, pagination, empty state |
+| [`compositions/settings.html`](https://github.com/pghqdev/HikarionUI/blob/main/compositions/settings.html) | Settings rail, form layout, fieldsets, dropzone, tabs and switches in `compact`, a destructive `<dialog>` |
+| [`compositions/auth.html`](https://github.com/pghqdev/HikarionUI/blob/main/compositions/auth.html) | Centred single-card flow, stepper, native validation, one solid primary action |
+
+They carry **zero classes**. Each has a small page-local `<style>` holding the
+page grid and nothing else — that is the "Your own CSS" line drawn in practice:
+layout is yours, appearance is Hikarion's. Density is composed, not global: a
+crisp page with a `data-density="compact"` region is the normal shape.
+
+Check your own markup the same way the compositions are checked:
+
+```sh
+bun scripts/validate-markup.mjs my-page.html
+```
+
+It reads the vocabulary out of `docs/public-surface.md` and flags invented
+`data-*` hooks, tones outside the grammar, and utility-shaped or off-vocabulary
+classes.
 
 ## Install
 

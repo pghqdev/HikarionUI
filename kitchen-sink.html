@@ -514,8 +514,12 @@
       focus. Pinned under its trigger with CSS anchor positioning, no JS. Rows are
       plain buttons and links: a destructive row is <code>data-variant="danger"</code>,
       an inert row is <code>aria-disabled</code> (still focusable and announced), and a
-      shortcut hint is a real <code>&lt;kbd&gt;</code>. It is a disclosure, not an APG
-      menu — <kbd>Tab</kbd> moves between rows. Compact tightens the rows and the
+      shortcut hint is a real <code>&lt;kbd&gt;</code>. With <code>hikarion.js</code> loaded
+      it is an APG menu: <kbd>↑</kbd>/<kbd>↓</kbd>, <kbd>Home</kbd>/<kbd>End</kbd> and
+      first-character typeahead move between rows, <kbd>Esc</kbd> or <kbd>Tab</kbd>
+      closes it. Without the script it stays an honest disclosure —
+      <kbd>Tab</kbd> moves between rows and no menu roles are claimed.
+      Compact tightens the rows and the
       trigger; the labels hold their size.</p>
     <div class="grid">
       <article>
@@ -602,9 +606,10 @@
       dismissed with <kbd>Esc</kbd>, nor revealed from the keyboard on a non-focusable
       element — for that, use <code>popover="hint"</code>: a real element toggled by a
       <code>[popovertarget]</code> button. <kbd>Esc</kbd>, light-dismiss and focus return
-      come from the browser only where <code>popover="hint"</code> is implemented (not in
-      any shipping Safari today; elsewhere it falls back to the <em>manual</em> state and
-      closes from its trigger). Compact tightens the bubble's
+      come from the browser where <code>popover="hint"</code> is implemented (not in any
+      shipping Safari today); elsewhere it falls back to the <em>manual</em> state and
+      <code>hikarion.js</code> supplies <kbd>Esc</kbd> and outside-click itself.
+      Compact tightens the bubble's
       padding and text; the delays are density-invariant.</p>
     <div class="grid">
       <article>

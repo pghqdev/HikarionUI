@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hikarion UI — settings composition</title>
+  <script>try{var t=localStorage.getItem("hikarion-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+  <link rel="stylesheet" href="../dist/hikarion.css">
+  <style>
+    /* Page-local layout only: the two-column settings shell. Classless. */
+    body { max-inline-size: 62rem; margin-inline: auto; padding: calc(var(--space) * 3) calc(var(--space) * 3) calc(var(--space) * 8); }
+    body > header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space); }
+    #shell { display: grid; gap: calc(var(--space) * 4); grid-template-columns: minmax(10rem, 13rem) minmax(0, 1fr); align-items: start; }
+    #shell > nav { position: sticky; top: calc(var(--space) * 2); }
+    @media (width < 42rem) {
+      #shell { grid-template-columns: minmax(0, 1fr); }
+      #shell > nav { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <nav data-breadcrumbs aria-label="Breadcrumb">
+        <ol>
+          <li><a href="dashboard.html">Northwind</a></li>
+          <li><span aria-current="page">Settings</span></li>
+        </ol>
+      </nav>
+      <h1>Settings</h1>
+    </div>
+    <div data-form-row>
+      <button data-set-theme="auto">Auto</button>
+      <button data-set-theme="light">Light</button>
+      <button data-set-theme="dark">Dark</button>
+    </div>
+  </header>
+
+  <main id="shell">
+    <nav data-nav="sidebar" aria-label="Settings sections">
+      <ul>
+        <li><a href="#general" aria-current="page">General</a></li>
+        <li><a href="#notifications">Notifications</a></li>
+        <li><a href="#danger">Danger zone</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <h2 id="general">General</h2>
+      <form>
+        <p>
+          <label for="project">Project name</label>
+          <input id="project" value="northwind-web" required>
+          <small>Shown in the dashboard and in deploy notifications.</small>
+        </p>
+        <p>
+          <label for="region">Primary region</label>
+          <select id="region">
+            <optgroup label="Europe">
+              <option selected>Frankfurt (eu-central-1)</option>
+              <option>Dublin (eu-west-1)</option>
+            </optgroup>
+            <optgroup label="Americas">
+              <option>Virginia (us-east-1)</option>
+            </optgroup>
+          </select>
+        </p>
+        <fieldset>
+          <legend>Contact</legend>
+          <div data-form-row>
+            <p><label for="owner">Owner</label><input id="owner" value="ada@northwind.dev" type="email"></p>
+            <p>
+              <label for="oncall">On-call handle</label>
+              <input id="oncall" list="handles" value="@ada">
+              <datalist id="handles">
+                <option value="@ada"></option>
+                <option value="@grace"></option>
+                <option value="@katherine"></option>
+              </datalist>
+            </p>
+          </div>
+        </fieldset>
+        <p>
+          <label data-dropzone>
+            <input type="file">
+            <span data-dropzone-filename aria-live="polite">Drop a project avatar here, or click to browse</span>
+          </label>
+        </p>
+        <footer data-form-row>
+          <button type="submit" data-variant="accent solid">Save changes</button>
+          <button type="reset">Reset</button>
+          <button data-tooltip="Changes apply on the next deploy" aria-label="When do changes apply?">?</button>
+        </footer>
+      </form>
+
+      <h2 id="notifications">Notifications</h2>
+      <p>Toggles are chrome, so this panel runs in <code>compact</code>: the same
+        markup, tighter. Compare it against the crisp form above.</p>
+      <article data-density="compact">
+        <div data-tabs>
+          <div data-tab-list>
+            <button aria-selected="true">Email</button>
+            <button>Webhooks</button>
+          </div>
+          <div data-tab-panel>
+            <p><label for="n-deploy"><input id="n-deploy" type="checkbox" role="switch" data-switch checked> Deployment finished</label></p>
+            <p><label for="n-fail"><input id="n-fail" type="checkbox" role="switch" data-switch data-variant="danger" checked> Deployment failed</label></p>
+            <p><label for="n-digest"><input id="n-digest" type="checkbox" role="switch" data-switch> Weekly digest</label></p>
+            <p>
+              <label for="quiet">Quiet hours until</label>
+              <input id="quiet" type="time" value="08:00">
+            </p>
+          </div>
+          <div data-tab-panel>
+            <p>
+              <label for="hook">Endpoint</label>
+              <input id="hook" type="url" value="https://hooks.northwind.dev/deploy">
+              <small>We POST a JSON body on every event you enable.</small>
+            </p>
+            <p><label for="n-retry"><input id="n-retry" type="checkbox" role="switch" data-switch checked> Retry failed deliveries</label></p>
+            <p><span data-chip>deploy.succeeded <button data-chip-remove aria-label="Remove deploy.succeeded">✕</button></span>
+               <span data-chip>deploy.failed <button data-chip-remove aria-label="Remove deploy.failed">✕</button></span></p>
+          </div>
+        </div>
+      </article>
+
+      <h2 id="danger">Danger zone</h2>
+      <div role="alert" data-variant="danger">
+        <strong>Deleting a project is permanent.</strong> Builds, logs and preview
+        URLs go with it.
+      </div>
+      <p><button commandfor="confirm-delete" command="show-modal" data-variant="danger solid">Delete project</button></p>
+
+      <dialog id="confirm-delete">
+        <h3>Delete northwind-web?</h3>
+        <p>This removes 412 deployments and cannot be undone. Type the project
+          name to confirm.</p>
+        <p><label for="confirm-name">Project name</label><input id="confirm-name" required></p>
+        <footer data-form-row>
+          <button commandfor="confirm-delete" command="close" data-variant="danger solid">Delete</button>
+          <button commandfor="confirm-delete" command="request-close">Cancel</button>
+        </footer>
+      </dialog>
+    </div>
+  </main>
+
+  <script src="../dist/hikarion.js" defer></script>
+</body>
+</html>

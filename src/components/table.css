@@ -22,9 +22,13 @@
    stick. Unconstrained, it is a horizontal scroller and the header never
    detaches.
 
-   Density rides base/elements.css: cell padding is --space-4 and the type is
-   --control-fz, so Compact tightens the chrome and the header band with it.
-   Checkbox size is untouched — it is a 24px hit target.
+   Density rides base/elements.css: cell padding is --space-4, the body type is
+   --control-fz and the head band is the density-scaled eyebrow, so Compact
+   tightens all three together. The select checkbox is left at its native ~13px
+   — it clears WCAG 2.2 §2.5.8 on the spacing exception, not on size, and the
+   cell padding keeps the row pitch well past 24px in both densities (~61px
+   Crisp, ~49px Compact). Shrink the cell padding below that and the exception
+   is what breaks, not the look.
 
    Markup:
      <div data-table>

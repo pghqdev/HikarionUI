@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hikarion UI — sign-up composition</title>
+  <script>try{var t=localStorage.getItem("hikarion-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+  <link rel="stylesheet" href="../dist/hikarion.css">
+  <style>
+    /* Page-local layout only: centre one card in the viewport. Classless.
+       The card is given a width because a query container used as an auto-sized
+       flex item stops contributing its content's width. */
+    body { min-block-size: 100dvh; display: grid; place-items: center; padding: calc(var(--space) * 3); }
+    main { inline-size: min(30rem, 100%); }
+    main > header { text-align: center; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Create your Northwind account</h1>
+      <p>Two minutes, no card. Already have one? <a href="#">Sign in</a>.</p>
+    </header>
+
+    <ol data-stepper>
+      <li><button>Account</button></li>
+      <li aria-current="step"><button>Workspace</button></li>
+      <li><button>Invite</button></li>
+    </ol>
+
+    <article>
+      <h2>Name your workspace</h2>
+      <div role="alert" data-variant="danger">
+        <strong>That subdomain is taken.</strong> Try another one.
+      </div>
+      <form>
+        <p>
+          <label for="workspace">Workspace</label>
+          <input id="workspace" value="northwind" required aria-invalid="true">
+          <small>Your team lands at <code>northwind.example.app</code>.</small>
+        </p>
+        <p>
+          <label for="size">Team size</label>
+          <select id="size">
+            <option>Just me</option>
+            <option selected>2–10</option>
+            <option>11–50</option>
+            <option>50+</option>
+          </select>
+        </p>
+        <p>
+          <label for="plan">Plan</label>
+          <select id="plan">
+            <option selected>Free — 100 builds / month</option>
+            <option>Team — $20 per seat</option>
+          </select>
+        </p>
+        <p><label for="terms"><input id="terms" type="checkbox" required> I accept the <a href="#">terms</a></label></p>
+        <footer data-form-row>
+          <button type="submit" data-variant="accent solid">Continue</button>
+          <button type="button">Back</button>
+        </footer>
+      </form>
+    </article>
+
+    <details>
+      <summary>Why do you need a workspace name?</summary>
+      <p>It becomes your subdomain and the prefix on every preview URL. You can
+        change it later, but the old URLs stop resolving.</p>
+    </details>
+
+    <footer data-form-row>
+      <span data-badge data-variant="success">SOC 2</span>
+      <span data-badge>EU hosted</span>
+      <a href="#">Privacy</a>
+    </footer>
+  </main>
+
+  <script src="../dist/hikarion.js" defer></script>
+</body>
+</html>

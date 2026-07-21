@@ -54,11 +54,12 @@
     "check": "bun scripts/contrast-check.mjs",
     "check:size": "bun scripts/bundle-size.mjs",
     "check:a11y": "bun scripts/a11y-check.mjs",
+    "check:markup": "bun scripts/validate-markup.mjs",
     "check:visual": "bun scripts/visual-check.mjs",
     "lint:css": "stylelint \"src/**/*.css\"",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test",
-    "ci": "bun run typecheck && bun test && bun run check && bun run lint:css && bun run build && bun run check:size && bun run check:a11y && bun run check:visual",
+    "ci": "bun run typecheck && bun test && bun run check && bun run lint:css && bun run check:markup && bun run build && bun run check:size && bun run check:a11y && bun run check:visual",
     "prepublishOnly": "bun run ci"
   },
   "publishConfig": {

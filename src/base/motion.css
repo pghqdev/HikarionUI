@@ -27,16 +27,38 @@
      that must feel instantaneous, and travel far enough that instant would read
      as a teleport.
 
-     ponytail: no --ease-pop. An overshoot curve with zero callers in core is a
-     design decision nothing has validated, and it is the one token here that can
-     be actively misapplied — on a dialog-sized surface it reads as wobble, not
-     snap. Add it with the first component that actually wants the bounce.
+     --ease-spring is the third, added now that a component finally earns it: the
+     switch thumb. The earlier refusal still stands for everything it refused —
+     an overshoot on a dialog- or menu-sized surface reads as wobble, not snap,
+     which is why the overlay pop above keeps its settle-tail curve. The switch
+     is the opposite case: a small, self-contained object the user physically
+     flips, travelling a fixed 1.1rem. There the ~6% overshoot reads as the thumb
+     arriving and seating, and it is the only place in core where it does. One
+     spring, one caller, deliberately. If a second component wants it, check it
+     is direct-manipulation and small before reaching for this.
+
+     The curve is a damped spring (ζ≈0.66) sampled at 10 segments — one
+     overshoot, no ring-out. Below the linear() floor (Chrome 113, Safari 17.4,
+     Firefox 112 — just above Hikarion's own floor) the token stays --ease-out
+     and the motion is simply undramatic; the @supports gate exists so the
+     substitution can never make a caller's transition invalid.
 
      No reduced-motion handling here. reset.css already clamps every duration
-     globally with !important, which neutralises all of this. */
+     globally with !important, which neutralises all of this — a sprung thumb
+     included: it lands instantly at the checked position, and the state stays
+     legible because the track fill, not the travel, is what carries it. */
   :root {
     --dur-fast: 0.09s;
     --dur-slow: 0.24s;
+    --ease-spring: var(--ease-out);
+  }
+
+  @supports (transition-timing-function: linear(0, 1)) {
+    :root {
+      --ease-spring: linear(
+        0, 0.266, 0.672, 0.942, 1.05, 1.061, 1.037, 1.013, 1, 0.996, 1
+      );
+    }
   }
 
   :is(dialog, [data-menu]) {

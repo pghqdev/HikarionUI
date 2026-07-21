@@ -183,11 +183,16 @@ Out of scope for 1.0 is still ticketed as post-1.0 work (tickets 39–43) so it 
 **Blocked by:** Accessibility & progressive-enhancement contract for the existing set
 
 - [ ] Context and action menu patterns work via native Popover + minimal hooks
-- [ ] Keyboard and focus behavior match expectations for menus
+- [x] Keyboard and focus behavior match expectations for menus
 - [x] Usable fallback exists when advanced APIs are missing
 - [x] Kitchen-sink + agent rules cover the patterns
 
-_Remaining: action menus and split-button menus ship; there is no right-click context-menu invocation (needs JS), and the panel stays a Tab-driven disclosure, not an APG `role="menu"` with roving tabindex._
+_Remaining: right-click context-menu invocation. Action menus, split buttons and
+the full APG keyboard model (roles, roving tabindex, arrows/Home/End/typeahead,
+Tab-to-close) ship; the roles are stamped by `hikarion.js` so the no-JS page
+stays an honest disclosure. Right-click was declined, not deferred by accident:
+it needs a new permanent `data-*` hook days before the 1.0 vocabulary freeze, has
+no no-JS path at all, and must suppress the browser's own context menu to work._
 
 ## Toast / notification stack
 
@@ -220,12 +225,15 @@ _Note: `Hikarion.toast()` caps the stack at 4 and evicts the oldest, so nothing 
 
 **Blocked by:** Accessibility & progressive-enhancement contract for the existing set
 
-- [ ] Tooltips meet accessibility expectations (trigger, timing, dismiss)
+- [x] Tooltips meet accessibility expectations (trigger, timing, dismiss)
 - [x] Delay/show/hide behavior is controlled and documented
 - [x] Works with keyboard focus, not hover-only
 - [x] Kitchen-sink + agent rules updated
 
-_Remaining: dismissal. `[data-tooltip]` is hover/focus-only with no `Esc`, and `[popover="hint"]` falls back to the manual popover state (no `Esc`, no light-dismiss) on every shipping browser today — it is toggleable only from its own trigger._
+_`[popover="hint"]` is dismissible on every browser with the Popover API:
+native where `hint` is implemented, `Esc` + outside-click from `hikarion.js`
+where it is not. `[data-tooltip]` remains CSS-only and cannot observe `Esc` —
+a permanent, documented limitation; use the popover shape when dismissal matters._
 
 ## Split button / button group
 
@@ -311,10 +319,18 @@ _Remaining: dismissal. `[data-tooltip]` is hover/focus-only with no `Esc`, and `
 
 **Blocked by:** Component reference & override docs; Data table; Select / searchable combobox; Navigation (sidebar + top); Empty states + skeleton loaders; Avatar + progress (linear & circular); Form layout helpers; Menu (context & action); Toast / notification stack
 
-- [ ] A small set of reference compositions ships and looks on-brand
-- [ ] Compositions exercise density and real product layouts
-- [ ] Lightweight validation script (or equivalent) can flag off-vocabulary markup
-- [ ] Agent-facing docs point to compositions + validator
+- [x] A small set of reference compositions ships and looks on-brand
+- [x] Compositions exercise density and real product layouts
+- [x] Lightweight validation script (or equivalent) can flag off-vocabulary markup
+- [x] Agent-facing docs point to compositions + validator
+
+_`compositions/dashboard.html`, `settings.html` and `auth.html` are built only
+from documented vocabulary and run in the axe gate beside the kitchen sink.
+Dashboard and settings carry a `data-density="compact"` region; auth is a
+single crisp card, so it is only analysed at crisp. `bun run check:markup`
+derives the legal hook set from the table in `docs/public-surface.md` rather
+than a hand-list. Not covered by the visual gate — that baseline is
+kitchen-sink only._
 
 ## Anchor positioning for overlays
 
@@ -401,12 +417,16 @@ _Note: an action row closes its menu via `command="hide-popover"`. Without invok
 
 **Blocked by:** Design-language foundations (type, motion, elevation)
 
-- [ ] Distinctive easing/spring feel is present on key interactions
-- [ ] Decorative motion disables under reduced-motion; essential state changes remain clear
-- [ ] Optional JS motion is truly optional
+- [x] Distinctive easing/spring feel is present on key interactions
+- [x] Decorative motion disables under reduced-motion; essential state changes remain clear
+- [x] Optional JS motion is truly optional
 - [ ] Kitchen-sink feels alive without playfulness-for-its-own-sake
 
-_Not started this round. `--ease-hikarion` / `--ease-out` are the existing curves; no spring/overshoot easing was added — `base/motion.css` records the decision to wait for a component that needs the bounce._
+_Answered: one spring, one caller. `--ease-spring` (damped `linear()`, ~6% overshoot)
+drives the switch thumb only; the overlay pop keeps its settle-tail curve because an
+overshoot on a dialog-sized surface reads as wobble. No JS. Reduced motion flattens it
+via the existing reset.css killswitch — the track fill, not the travel, carries the
+state. The last box is left for a human look at the rendered kitchen sink._
 
 ## Density refinement across the full component set
 
@@ -425,10 +445,17 @@ _Not started this round. `--ease-hikarion` / `--ease-out` are the existing curve
 
 **Blocked by:** Production CI quality gates; High-contrast / forced-colors theme support; Community & maintenance hygiene
 
-- [ ] Theme authoring guidelines document AA + vocabulary requirements
-- [ ] Acceptance gate rejects themes that fail contrast/a11y checks
-- [ ] Existing community themes are evaluated against the gate
-- [ ] Contributing docs link the theme path clearly
+- [x] Theme authoring guidelines document AA + vocabulary requirements
+- [x] Acceptance gate rejects themes that fail contrast/a11y checks
+- [x] Existing community themes are evaluated against the gate
+- [x] Contributing docs link the theme path clearly
+
+_`docs/theming.md` documents the thirteen Tier-1 colour tokens and the AA ratios;
+`bun scripts/contrast-check.mjs <theme.css>` is the gate (scope, vocabulary, every
+contrast pair). All three shipped themes pass; narrowest margin is dracula
+`--danger`/`--danger-content` at 4.53:1. The gate is contrast + vocabulary only
+— it runs no axe pass on a candidate theme, because a theme changes colours, not
+markup, and the axe gate already covers the markup those colours land on._
 
 ## 1.0 vocabulary freeze & release ceremony
 

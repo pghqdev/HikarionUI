@@ -1,7 +1,13 @@
 /* Badge — [data-badge], a bare hook. A small inline pill for counts, states,
    and labels. Neutral by default; data-variant="<tone> [solid]" tints or
    fills it — the status tokens are Tier-1, so a success/danger badge costs a
-   theme nothing it hasn't already paid. Tones resolve in base/tone.css. */
+   theme nothing it hasn't already paid. Tones resolve in base/tone.css.
+
+   The one component with no `--_density` in it, on purpose: size and padding
+   are `em`, so a badge sizes to whatever it sits in — an <h2>, a table cell,
+   a Compact nav item — and picks up density through its host's type rather
+   than twice over. Reading --control-fz-sm instead would make a badge in a
+   heading render at form-control size. */
 
 @layer hikarion {
   [data-badge] {

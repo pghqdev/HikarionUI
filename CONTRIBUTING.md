@@ -42,12 +42,16 @@ If you change a public hook or Tier-1 token, update that file,
 
 ## Themes
 
-Community themes are welcome when they:
+Community themes are welcome. The full bar — the thirteen required Tier-1
+colour tokens, the WCAG 2.2 AA ratios, and the file shape — is
+[`docs/theming.md`](docs/theming.md). The gate runs on your candidate file
+before it is merged:
 
-- Set only existing Tier-1 tokens (no new public names without an RFC)
-- Pass `bun run check` (WCAG AA contrast on gated pairs)
+```sh
+bun scripts/contrast-check.mjs src/themes/your-theme.css
+```
 
-See [`docs/public-surface.md`](docs/public-surface.md) for the token list.
+Exit 0 or it is not accepted.
 
 ## Pull requests
 

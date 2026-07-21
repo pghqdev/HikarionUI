@@ -5,8 +5,9 @@
 
    Tone-respecting: `data-variant="<tone>"` retints the active track via the
    tone resolver (base/tone.css); without a tone the switch defaults to the
-   accent. The thumb slides on `--ease-hikarion`, gated by the global
-   reduced-motion killswitch in reset.css.
+   accent. The thumb slides on `--ease-spring` (base/motion.css) — the one
+   sprung motion in core; the fill still carries the state, so the global
+   reduced-motion killswitch in reset.css can flatten the travel to nothing.
 
    Add `role="switch"`: the control looks and behaves like an on/off switch, so
    it should be announced as one rather than as a checked/unchecked checkbox
@@ -57,7 +58,7 @@
     border-radius: var(--radius-pill);
     background: var(--fg);
     box-shadow: var(--shadow-sm);
-    transition: transform var(--dur) var(--ease-hikarion),
+    transition: transform var(--dur-slow) var(--ease-spring),
                 background var(--dur) var(--ease-hikarion);
   }
 

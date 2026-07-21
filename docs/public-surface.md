@@ -4,7 +4,10 @@ Consumers and agents may depend on the names below. Anything not listed here —
 including Tier-2 derived tokens and undocumented `data-*` attributes — is
 **internal** and may change without a major version.
 
-Canonical markup contracts live in [`rules/hikarion-rules.md`](../rules/hikarion-rules.md).
+Canonical markup contracts live in [`rules/hikarion-rules.md`](../rules/hikarion-rules.md);
+whole pages built from them live in [`compositions/`](../compositions/), and
+`bun run check:markup` holds those pages to the names in this file — so this
+table is executable, not just descriptive.
 Versioning rules live in [`versioning.md`](./versioning.md). This file is the
 *contract*; [`tokens.md`](./tokens.md) is the full reference including the
 internal derived tokens, [`overrides.md`](./overrides.md) covers customising and
@@ -48,6 +51,7 @@ things authors read or set, so they are frozen surface too.
 | `--elevation-0` … `--elevation-4` | The material ladder: flush, raised, lifted, floating, overlay | Read |
 | `--shadow-sm` / `--shadow` / `--shadow-lg` | Aliases for rungs 1, 2 and 4 | Read |
 | `--dur-fast` / `--dur-slow` | Durations beside the Tier-1 `--dur` | Read |
+| `--ease-spring` | Sprung easing for small direct-manipulation travel (the switch thumb). Falls back to `--ease-out` where `linear()` is unsupported | Read |
 | `--hk-value` | Fill percentage (0–100) of a `[data-spinner][role="progressbar"]` | Set by the author |
 | `--hk-tooltip-delay` | Show delay of a `[data-tooltip]` (default `0.4s`) | Set by the author |
 | `--hk-tooltip-delay-out` | Hide delay of a `[data-tooltip]` (default `--dur-slow`). Load-bearing: at `0` the bubble stops being hoverable | Set by the author |

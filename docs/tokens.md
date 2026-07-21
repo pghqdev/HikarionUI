@@ -158,11 +158,16 @@ variant — is in
 [the rules file](../rules/hikarion-rules.md#density).
 
 What it actually moves is the two multipliers above, and therefore: every
-`--space-*` step, control and field padding, and control type. What it
-deliberately does **not** move, and why:
+`--space-*` step, control and field padding, control type, field `<label>`s and
+`<thead>` column headers. Every shipped component sits on that scale or states
+in its file header why it does not — density is the framework's second axis
+beside `data-theme`, not a polish pass over a comfortable default.
+
+What it deliberately does **not** move, and why:
 
 | Untouched | Why |
 |-----------|-----|
+| `[data-badge]`, `[data-spinner]` | Sized in `em`. They take density from the type of whatever hosts them; reading a control step too would scale them twice, and a badge in an `<h2>` would render at form-control size. |
 | `--text-1` … `--text-eyebrow`, body copy, code blocks | Dense ≠ harder to read. Compact is for more rows on screen, not smaller prose. |
 | The switch track (24px) | WCAG 2.2 §2.5.8 target size. Compact has no room to shrink it. |
 | Pagination pills, the toast close button | Same floor. Both are verified at both densities by `bun run check:a11y`. |

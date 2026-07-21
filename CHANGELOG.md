@@ -114,6 +114,35 @@ Public surface and deprecation rules: [`docs/versioning.md`](docs/versioning.md)
   raises `fg/bg` + `fg/surface` to 7:1 — under `prefers-contrast: more` those two
   pairs *are* the muted and border pairs, so the AAA floor is what makes "more
   contrast" mean measurably more
+- **APG menu semantics for `[data-menu]`** — `hikarion.js` stamps
+  `role="menu"`/`role="menuitem"`, a roving tabindex and `aria-haspopup`, moves
+  focus into the panel on open, and wires `↑` `↓` `Home` `End`, first-character
+  typeahead and `Tab`-to-close. No new markup and no new hook; without the
+  script (or without the Popover API) the panel stays the Tab-driven disclosure
+  it was, with no roles claimed
+- **`Esc` and light-dismiss for hint tooltips** — where `popover="hint"` is
+  unimplemented (every shipping Safari today) the value falls back to the
+  *manual* popover state, which is neither. `hikarion.js` detects that and
+  supplies both, so WCAG 2.2 1.4.13 *dismissible* holds anywhere the Popover API
+  exists. The attribute is not rewritten to `auto`
+- `--ease-spring`: a damped-spring `linear()` easing, applied to the switch
+  thumb — the one direct-manipulation control in core small enough for an
+  overshoot to read as arrival rather than wobble. Falls back to `--ease-out`
+  below the `linear()` floor
+- `docs/theming.md`: community theme authoring guidelines — the thirteen
+  required Tier-1 colour tokens, the WCAG 2.2 AA ratios (with the 7:1 floor on
+  `--fg`/`--bg` and `--fg`/`--surface`), file shape and submission steps
+- Theme acceptance gate: `bun scripts/contrast-check.mjs <path/to/theme.css>`
+  checks a candidate theme file (a contributor PR) for a `[data-theme="name"]`
+  scope, all thirteen Tier-1 colour tokens, and every gated contrast pair.
+  `bun run check` with no argument keeps checking the shipped themes, now
+  including the vocabulary check
+- `compositions/` — three reference pages agents can copy wholesale (dashboard,
+  settings, auth), built only from the documented vocabulary and gated by axe
+  alongside the kitchen sink
+- Markup validator: `bun run check:markup` derives the legal `data-*` set from
+  the table in `docs/public-surface.md` — no hand-maintained list — and fails on
+  an unknown hook or any `class` attribute that reads as a utility stack
 
 The nine new hooks across this release (`data-avatar`, `data-avatar-group`,
 `data-empty`, `data-skeleton`, `data-form-row`, `data-nav`, `data-table`,

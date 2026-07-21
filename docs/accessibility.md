@@ -85,13 +85,13 @@ Every interactive pattern in `kitchen-sink.html`, driven from the keyboard.
 | Dialog | `Enter` on invoker, `Tab`, `Esc` | ✅ See the focus-order table above. |
 | Tabs | `Tab` to the tablist, `←` `→` `↑` `↓` `Home` `End`, `Tab` into the panel | ✅ APG tablist: roving `tabindex` (one stop for the whole list), automatic activation, panel is `tabindex="0"` so its content is reachable. |
 | Accordion | `Tab`, `Enter`/`Space` | ✅ Native `<summary>`; inset focus ring so it stays inside the rounded box. |
-| Dropdown / action menu | `Enter` on trigger, `Tab`, `Esc` | ✅ Native popover: `Tab` moves into the popover from the invoker, `Esc` light-dismisses and returns focus to the trigger. An action row carries `command="hide-popover"`, so activating it closes the menu and focus returns to the trigger — same as `Esc`, no script. Inert rows use `aria-disabled`, so they keep their tab stop and stay announced. **Not** an APG menu — see limitations. |
+| Dropdown / action menu | `Enter`/`↓` on trigger, `↑` `↓` `Home` `End`, typeahead, `Tab`, `Esc` | ✅ With `hikarion.js` it is an APG menu button: the script stamps `role="menu"`/`role="menuitem"` and a roving tabindex, opening moves focus to the first row, `↑`/`↓` wrap, `Home`/`End` jump, a printable character jumps to the next row starting with it, `Esc` and light-dismiss close it and return focus to the trigger; `Tab` closes it and moves on to the next element after the trigger, per APG. Without the script (or without the Popover API) no roles are stamped and it stays the honest Tab-driven disclosure. An action row carries `command="hide-popover"`, so activating it closes the menu, no script needed. Inert rows use `aria-disabled`, so they keep their place in the menu and stay announced. |
 | Button group / split button | `Tab`, `Enter`/`Space` | ✅ Plain tab order — every child is a real `<button>`, nothing roving, nothing trapped. The focused button is raised above its overlapping neighbour so the ring is never clipped. The chevron-only menu half renders with no text and **must** carry its own `aria-label`. |
 | Nav | `Tab`, `Enter` | ✅ Native links only. The current item is `aria-current="page"` and is marked by geometry (underline / inline-start edge) as well as colour. |
 | Data table | `Tab`, `Space` | ✅ Selection is a native checkbox per row, so it is keyboard-operable, submittable and announced as a real checked state. Each needs an author-supplied `aria-label` naming its row — documented, not enforceable in CSS. |
 | Select / combobox | `Tab`, arrows, type-ahead | ✅ Entirely native: `<select>`, `select[multiple]` and `input[list]` + `<datalist>` keep the browser's own combobox/listbox roles and keyboard model. |
 | Date & time fields | `Tab`, arrows, digits | ✅ Native segment editing and the platform picker; Hikarion restyles the picker button only. |
-| Tooltip | `Tab` to the trigger | ✅ on focusable triggers. The `popover="hint"` shape adds a real button trigger that toggles the bubble; `Esc` only where `popover="hint"` is implemented — see limitations. |
+| Tooltip | `Tab` to the trigger, `Esc` | ✅ on focusable triggers. The `popover="hint"` shape adds a real button trigger that toggles the bubble. `Esc` and light-dismiss are the browser's where `popover="hint"` is implemented, and `hikarion.js` supplies both where it is not — so the popover shape is dismissible on every browser with the Popover API. `[data-tooltip]` (CSS-only) still has no `Esc` — see limitations. |
 | Toast | `Tab` to the ✕ | ✅ Reachable while shown, including over a modal `<dialog>`: the top layer does *not* escape inertness, so while a modal is open the region is parked inside that dialog (and handed back to `<body>` on close) — otherwise a toast over a modal would paint but be unfocusable and unclickable; `aria-live` announces without stealing focus. The timer pauses while the toast is hovered or holds focus, and the ✕ is 24px in both densities. |
 | Switch | `Tab`, `Space` | ✅ Native checkbox + `role="switch"`. Track is pinned at 24px in both densities (WCAG 2.2 §2.5.8) — Compact has no room to shrink it. |
 | Chips | `Tab`, `Enter`/`Space` | ✅ Filter chips are `<button aria-pressed>`; the remove ✕ is its own button with an `aria-label`. |
@@ -115,15 +115,24 @@ Real, deliberate, and not fixed:
   still cannot reveal it. Use `popover="hint"` with a `[popovertarget]` button
   when the trigger must be keyboard-reachable: the button toggles the bubble, so
   it is dismissible without moving focus. Esc and light-dismiss are the browser's
-  only where `popover="hint"` is implemented — no shipping Safari has it today,
-  and the invalid-value default is the **manual** state, not `auto` (see
-  docs/browser-support.md). Neither shape is reliably announced — give the
-  trigger a real accessible name.
-- **`[data-menu]` is a disclosure, not an APG menu.** It is a native popover
-  containing ordinary buttons and links: `Tab` navigates it, not `↑`/`↓`, and
-  there is no `role="menu"`. This is the honest description of what the markup
-  is; adding menu roles without menu keyboard behaviour would be worse than
-  neither.
+  where `popover="hint"` is implemented (no shipping Safari today; elsewhere the
+  invalid-value default is the **manual** state, not `auto`). `hikarion.js`
+  closes that gap: where `hint` is unimplemented it adds `Esc` and outside-click
+  dismissal to open `[popover="hint"]` elements, so WCAG 2.2 1.4.13
+  *dismissible* holds on every browser with the Popover API. It does not rewrite
+  the attribute to `auto` — that selector is the bubble's entire skin, and `auto`
+  would close any open menu. Without the script and without `hint`, the trigger
+  is the only dismissal. Neither shape is reliably announced — give the trigger a
+  real accessible name.
+- **`[data-menu]` is only an APG menu with JS.** The markup is a native popover
+  containing ordinary buttons and links. `hikarion.js` upgrades it in place —
+  `role="menu"`/`role="menuitem"`, roving tabindex, `↑`/`↓`/`Home`/`End`,
+  first-character typeahead, `Tab` to close — because roles and the keyboard
+  model have to arrive together; menu roles without menu keys are worse than
+  neither. With no script, or on a browser without the Popover API (where the
+  panel drops into flow), nothing is stamped and `Tab` navigates a disclosure.
+  That is a real difference in what a screen reader announces, and it is the
+  price of not lying in the markup.
 - **Tabs need JS.** They are the only pattern that does. With no JS the roles
   are absent and every panel is visible and readable — content is never lost,
   but it is also not a tablist.
@@ -154,7 +163,8 @@ Verified in Chromium with `javaScriptEnabled: false`, and again with only
 
 **Works unchanged** — all styling and theming; `<dialog>` open/close (native
 `command` invokers); `[data-menu]` open, light-dismiss and `Esc` (native
-popover); a `[data-menu]` action row closing its own menu (a native
+popover — but menu roles and arrow-key navigation need `hikarion.js`); a
+`[data-menu]` action row closing its own menu (a native
 `command="hide-popover"` invoker); `popover="hint"` open and toggle-to-close;
 the split button; `<select>`, `select[multiple]` and the
 `input[list]` + `<datalist>` combobox; date/time fields and their platform
@@ -170,6 +180,8 @@ these is presentational or native.
 | Feature | Without JS |
 |---------|-----------|
 | Tabs | All three panels visible and stacked, no ARIA roles. Readable; not a tablist. |
+| `[data-menu]` roles & arrow keys | No `role="menu"` is stamped; the panel stays a Tab-driven disclosure. Open, `Esc` and light-dismiss are native and unaffected. |
+| `popover="hint"` on Safari without the script | The bubble falls back to the manual popover state: it toggles from its trigger, but `Esc` and outside-click do nothing. Loading `hikarion.js` restores both. |
 | Chip toggle / remove | Chips render and focus; `aria-pressed` does not flip and ✕ does not remove. |
 | Dropzone drag highlight & filename | No accent highlight, and the prompt text does not change to the chosen filename. A native `input[type="file"]` accepts a dropped file itself, so the drop *should* still select the file with no JS — that follows from the input now covering the card, but a synthetic drop event cannot set `input.files`, so it is **untested here** and rests on spec behaviour alone. |
 | Theme switcher | `[data-set-theme]` buttons do nothing; the page uses the OS `prefers-color-scheme`. |

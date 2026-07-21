@@ -15,11 +15,13 @@
    the native invoker, never a click handler. Chromium exposes no expanded
    state for a hide-only invoker, so the row's semantics are untouched.
 
-   ponytail: this is a *disclosure* — real buttons reached with Tab — not an
-   APG `role="menu"`. Roving-tabindex arrow keys cannot be done in CSS, and
-   menu roles without menu keys are worse than neither (docs/accessibility.md).
-   Upgrade path: add roving-tabindex wiring to hikarion.js, then role="menu" /
-   "menuitem" on top of exactly this markup. */
+   The markup is a *disclosure* — real buttons reached with Tab. hikarion.js
+   upgrades it in place to an APG menu (role="menu"/"menuitem", roving
+   tabindex, ↑/↓/Home/End/typeahead, Tab closes) because roles and menu keys
+   have to arrive together; roles without keys are worse than neither
+   (docs/accessibility.md). Without the script, or without the Popover API,
+   nothing is stamped and the Tab-driven disclosure is what you get. No CSS
+   here keys off the roles — the styling is the same either way. */
 
 @layer hikarion {
   [data-menu] {

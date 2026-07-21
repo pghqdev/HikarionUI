@@ -15,7 +15,11 @@
    docs/browser-support.md — no Safari today), `popover`'s invalid-value default
    is the **manual** state: no Esc, no light-dismiss. It still toggles from its
    invoker, so it is dismissible without moving focus, but only from the
-   trigger.
+   trigger — and hikarion.js adds Esc and outside-click there, so *dismissible*
+   holds on every browser with the Popover API, with or without `hint`. The
+   attribute is deliberately not rewritten to `auto` by that script: this
+   selector is the bubble's whole skin, and `auto` would close any open menu.
+   With no script and no `hint`, the trigger is the only dismissal.
 
    Delay: `--hk-tooltip-delay` (show, 0.4s) and `--hk-tooltip-delay-out` (hide,
    --dur-slow) are read with fallbacks and never declared, so they inherit —

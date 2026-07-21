@@ -414,10 +414,12 @@
     box-shadow: inset 0 0 0 1px var(--danger);
   }
 
+  /* Field labels are chrome, not copy — they scale with the control they name,
+     or a Compact form reads as full-size labels stacked on shrunken fields. */
   label {
     display: inline-block;
     margin-block-end: var(--space-3);
-    font-size: 0.8125rem;
+    font-size: calc(0.8125rem * var(--_density-type));
     font-weight: 550;
     letter-spacing: 0.005em;
     color: var(--muted);
@@ -738,9 +740,13 @@
     text-align: start;
     border-block-end: 1px solid var(--line);
   }
+  /* The column header is the same eyebrow voice as <h6>, but it is control
+     chrome rather than reading matter, so unlike --text-eyebrow it rides
+     density — otherwise Compact shrinks every cell's type and leaves the
+     header band at full size, which is the "squeezed on" look. */
   thead th {
     font-weight: 550;
-    font-size: 0.75rem;
+    font-size: calc(0.75rem * var(--_density-type));
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--muted);

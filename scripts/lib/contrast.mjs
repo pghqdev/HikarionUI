@@ -27,6 +27,20 @@ export const ACCENT_PAIRS = [
   ["accent", "surface"],
 ];
 
+// Every Tier-1 colour token a theme must define. A theme that omits one still
+// *looks* right at the top level — it inherits core — and then breaks the
+// moment it is nested inside another theme, where the inherited value is the
+// wrong palette's. --border is the only one no contrast pair would catch.
+/** @type {string[]} */
+export const REQUIRED_COLOR_TOKENS = [
+  "bg",
+  "fg",
+  "surface",
+  "muted",
+  "border",
+  ...TONES.flatMap((tone) => [tone, `${tone}-content`]),
+];
+
 const MIN_RATIO = 4.5;
 
 // The `prefers-contrast: more` floor. It is not checked against a separate set
@@ -120,5 +134,23 @@ export function checkContrastPairs(scopes, opts = {}) {
     }
   }
 
+  return { failed, results };
+}
+
+/**
+ * Vocabulary half of the theme gate: every scope declares every Tier-1 colour.
+ * @param {Record<string, Record<string, [number, number, number]>>} scopes
+ */
+export function checkThemeVocabulary(scopes) {
+  /** @type {Array<{ scope: string, token: string, ok: boolean }>} */
+  const results = [];
+  let failed = false;
+  for (const [scope, tokens] of Object.entries(scopes)) {
+    for (const token of REQUIRED_COLOR_TOKENS) {
+      const ok = token in tokens;
+      if (!ok) failed = true;
+      results.push({ scope, token, ok });
+    }
+  }
   return { failed, results };
 }

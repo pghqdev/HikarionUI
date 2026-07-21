@@ -4,7 +4,7 @@ import stylelint from "stylelint";
  * Ban Tailwind-like utility class selectors in framework CSS.
  * Allowed exception: hk-* (framework-owned progressive-enhancement hooks).
  */
-const utilityPattern =
+export const utilityPattern =
   /^\.(?:flex|grid|block|inline|hidden|absolute|relative|sticky|fixed|container|sr-only|truncate|rounded(?:-(?:sm|md|lg|xl|full))?|p(?:[xytblr])?-\d+|m(?:[xytblr])?-\d+|gap-\d+|space-[xy]-\d+|w-\d+|h-\d+|min-w-|max-w-|text-(?:xs|sm|base|lg|xl|center|left|right)|bg-|text-(?:white|black|gray|red|blue)|border(?:-\d+)?|shadow(?:-(?:sm|md|lg))?|font-(?:bold|medium|semibold)|items-|justify-|overflow-|z-\d+|opacity-\d+|col-span-|row-span-)/;
 
 const { createPlugin, utils } = stylelint;
