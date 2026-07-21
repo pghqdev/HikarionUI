@@ -434,10 +434,12 @@ state. The last box is left for a human look at the rendered kitchen sink._
 
 **Blocked by:** Ship Crisp / Compact density as first-class; Data table; Select / searchable combobox; Navigation (sidebar + top); Empty states + skeleton loaders; Avatar + progress (linear & circular); Form layout helpers; Menu (context & action); Toast / notification stack; Command palette / search dialog; Date / time inputs (native-first); Pagination polish; Breadcrumbs polish; Tooltip (accessible + delay-controlled); Split button / button group; Meter and range polish; File upload with preview slots
 
-- [ ] Every shipped component has intentional Crisp and Compact presentation
-- [ ] Visual regression + contrast cover both modes across the set
-- [ ] Agent rules and docs describe density as native, not optional polish
-- [ ] No component looks “comfortable default with compact squeezed on”
+- [x] Every shipped component has intentional Crisp and Compact presentation
+- [x] Visual regression + contrast cover both modes across the set
+- [x] Agent rules and docs describe density as native, not optional polish
+- [x] No component looks “comfortable default with compact squeezed on”
+
+_Audited component by component. Two components were the “squeezed on” tell and were fixed: `<label>` and `thead th` were hard-sized, so Compact shrank the field and the cells while leaving their label and header band at full size. Everything else either sits on the density scale or states in its header why it is invariant (`badge`, `switch`, `skeleton`, `spinner`, type, elevation). Target-size measured in a browser, not assumed: nothing crosses the 24px floor going Crisp → Compact. Re-open when Command palette ships — it is the one blocker component still missing, and it will need the same pass._
 
 ## Community theme guidelines + WCAG 2.2 AA acceptance gate
 

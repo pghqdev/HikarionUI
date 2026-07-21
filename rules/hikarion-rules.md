@@ -771,7 +771,10 @@ remain as aliases for rungs 1, 2 and 4.
 `--dur` and `--ease-hikarion` are the default pairing. Beside them,
 `--dur-fast` (0.09s) for state flips that must feel instantaneous, and
 `--dur-slow` (0.24s) for travel far enough that instant would read as a
-teleport. All motion is neutralised globally under `prefers-reduced-motion`.
+teleport. `--ease-spring` is a damped curve with a small overshoot, for
+direct-manipulation travel only — the switch thumb uses it; a dialog-sized
+surface would read as wobble. All motion is neutralised globally under
+`prefers-reduced-motion`.
 
 ### Scroll progress
 

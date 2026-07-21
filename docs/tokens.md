@@ -127,6 +127,7 @@ Type is density-invariant. Density tightens chrome, not reading matter.
 |-------|-------|------|
 | `--dur-fast` | `0.09s` | a state flip that must feel instantaneous |
 | `--dur-slow` | `0.24s` | travel far enough that instant reads as a teleport |
+| `--ease-spring` | damped `linear()`, ~6% overshoot | small direct-manipulation travel — the switch thumb. Overshoot on a dialog-sized surface reads as wobble, so overlays keep `--ease-hikarion`. Falls back to `--ease-out` where `linear()` is unsupported |
 
 `--dur` and `--ease-hikarion` (Tier-1) remain the default pairing. All of it is
 neutralised globally under `prefers-reduced-motion` — see
