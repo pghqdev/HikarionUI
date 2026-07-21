@@ -1,0 +1,128 @@
+---
+import Page from "../layouts/Page.astro";
+---
+
+<Page
+  title="Token playground"
+  description="Drag three of Hikarion's 19 Tier-1 tokens and watch the spacing, radius and shadow scales re-derive live, in any theme and either density."
+>
+  <h1>Token playground</h1>
+  <p class="lede">
+    It's all 19 Tier-1 variables. Drag three of them and watch the whole page
+    recompute — the spacing scale, the radius scale and the accent-tinted
+    shadows are all derived, never set. The hue slider keeps the current theme's
+    lightness and chroma and moves only the hue, which is what a theme swap does
+    too.
+  </p>
+
+  <div class="play">
+    <div>
+      <h5>Density</h5>
+      <nav class="switch" aria-label="Density">
+        <button data-set-density="crisp" aria-pressed="true">Crisp</button>
+        <button data-set-density="compact" aria-pressed="false">Compact</button>
+      </nav>
+      <p><small>Two values, nestable like <code>data-theme</code>, pure CSS. It tightens chrome — padding, control size, control type — and deliberately leaves headings, body copy and the switch's 24px target alone.</small></p>
+
+      <p>
+        <label for="hue">Accent hue <output id="hue-val">258</output></label>
+        <input id="hue" type="range" min="0" max="360" value="258" />
+      </p>
+      <p>
+        <label for="radius">Radius <output id="radius-val">0.875rem</output></label>
+        <input id="radius" type="range" min="0" max="1.75" step="0.0625" value="0.875" />
+      </p>
+      <p>
+        <label for="space">Space <output id="space-val">0.5rem</output></label>
+        <input id="space" type="range" min="0.3" max="0.9" step="0.05" value="0.5" />
+      </p>
+      <div class="swatches" aria-hidden="true">
+        <span class="swatch" style="background:var(--accent)"></span>
+        <span class="swatch" style="background:var(--surface)"></span>
+        <span class="swatch" style="background:var(--success)"></span>
+        <span class="swatch" style="background:var(--danger)"></span>
+      </div>
+      <p><button id="reset" style="margin-block-start:var(--space-4)">Reset</button></p>
+    </div>
+
+    <div>
+      <article>
+        <span data-badge data-variant="accent">Live preview</span>
+        <h3>Everything derives</h3>
+        <p>This card, its radius, its accent-tinted shadow, and the controls below all read from the three tokens on the left.</p>
+        <div class="row">
+          <button data-variant="solid">Accent</button>
+          <button>Quiet</button>
+          <button data-variant="danger">Delete</button>
+        </div>
+        <div class="row" style="margin-block-start:var(--space-4)">
+          <span data-badge data-variant="success">Passing</span>
+          <span data-badge data-variant="warning">Flaky</span>
+          <button data-chip aria-pressed="true">Filter</button>
+        </div>
+        <p style="margin-block-start:var(--space-4)">
+          <label for="pg-email">Email</label>
+          <input id="pg-email" type="email" placeholder="you@example.com" />
+        </p>
+        <div role="alert" data-variant="danger" style="margin-block-start:var(--space-4)"><strong>Danger</strong> — tint recolours with the hue.</div>
+        <progress value="0.6" style="margin-block-start:var(--space-4)"></progress>
+      </article>
+
+      <p style="margin-block-start:var(--space-5)">
+        <small>Want the full surface? The <a href={import.meta.env.BASE_URL + "demo/kitchen-sink.html"}>kitchen sink</a> renders every component at once.</small>
+      </p>
+    </div>
+  </div>
+
+  <style>
+    .lede { color: var(--muted); max-width: 62ch; }
+    .play { display: grid; gap: var(--space-7); grid-template-columns: minmax(0, 20rem) 1fr; align-items: start; }
+    @media (max-width: 48rem) { .play { grid-template-columns: 1fr; } }
+    .play label { display: flex; justify-content: space-between; }
+    .play output { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .swatches { display: flex; gap: var(--space-2); }
+    .swatch { inline-size: 2rem; block-size: 2rem; border-radius: var(--radius-sm); border: 1px solid var(--line); }
+  </style>
+
+  <script is:inline>
+    // Token playground: drive three Tier-1 tokens on :root; Tier-2 (spacing,
+    // radius, shadows, tints) re-derives from them, live.
+    const root = document.documentElement;
+    const bind = (id, fmt, apply) => {
+      const el = document.getElementById(id);
+      const out = document.getElementById(id + "-val");
+      el.addEventListener("input", () => { out.textContent = fmt(el.value); apply(el.value); });
+    };
+    // Hue only: drop our own override first, read whatever the active theme's
+    // --accent is, and put its lightness and chroma back with the new hue. A
+    // fixed lightness here would look right in light mode and fail contrast in
+    // dark — the L a theme picks is the part that keeps the accent readable.
+    bind("hue", (v) => v, (v) => {
+      root.style.removeProperty("--accent");
+      const m = getComputedStyle(root).getPropertyValue("--accent").match(/oklch\(\s*([\d.]+%)\s+([\d.]+)/);
+      if (m) root.style.setProperty("--accent", `oklch(${m[1]} ${m[2]} ${v})`);
+    });
+    bind("radius", (v) => `${(+v).toFixed(3).replace(/0+$/, "").replace(/\.$/, "")}rem`, (v) => root.style.setProperty("--radius", `${v}rem`));
+    bind("space", (v) => `${v}rem`, (v) => root.style.setProperty("--space", `${v}rem`));
+    // Density is a plain attribute on a container — no framework JS behind it.
+    // Wrapped in a View Transition where the browser has one; identical without.
+    for (const btn of document.querySelectorAll("[data-set-density]")) {
+      btn.addEventListener("click", () => {
+        const apply = () => {
+          root.dataset.density = btn.dataset.setDensity;
+          for (const b of document.querySelectorAll("[data-set-density]"))
+            b.setAttribute("aria-pressed", String(b === btn));
+        };
+        document.startViewTransition ? document.startViewTransition(apply) : apply();
+      });
+    }
+
+    document.getElementById("reset").addEventListener("click", () => {
+      ["--accent", "--radius", "--space"].forEach((p) => root.style.removeProperty(p));
+      for (const [id, v] of [["hue", 258], ["radius", 0.875], ["space", 0.5]]) {
+        document.getElementById(id).value = v;
+        document.getElementById(id + "-val").textContent = id === "hue" ? v : `${v}rem`;
+      }
+    });
+  </script>
+</Page>

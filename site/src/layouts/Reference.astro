@@ -1,0 +1,44 @@
+---
+// The component reference is the agent rules file verbatim, so the page humans
+// read and the file coding agents are handed cannot drift.
+import Page from "./Page.astro";
+
+const { frontmatter, headings } = Astro.props;
+const BASE = import.meta.env.BASE_URL;
+
+// h2 groups, h3 components under them.
+const groups = [];
+for (const h of headings) {
+  if (h.depth === 2) groups.push({ ...h, items: [] });
+  else if (h.depth === 3 && groups.length) groups.at(-1).items.push(h);
+}
+---
+
+<Page title={frontmatter.title} description={frontmatter.description} wide>
+  <div class="doc" data-cols="2">
+    <nav class="side" aria-label="Components">
+      <p>
+        <a href={`${BASE}demo/kitchen-sink.html`}>Live kitchen sink ↗</a><br />
+        <a href={`${BASE}hikarion-rules.md`}>Raw markdown ↗</a>
+      </p>
+      {groups.map((g) => (
+        <>
+          <h6><a href={`#${g.slug}`}>{g.text}</a></h6>
+          {g.items.length > 0 && (
+            <ul>{g.items.map((i) => <li><a href={`#${i.slug}`}>{i.text}</a></li>)}</ul>
+          )}
+        </>
+      ))}
+    </nav>
+
+    <article class="prose">
+      <h1>{frontmatter.title}</h1>
+      <p>
+        Every hook, its markup contract, and its accessibility notes. This page is
+        <a href={`${BASE}hikarion-rules.md`}>the same file coding agents are given</a> —
+        see it running in the <a href={`${BASE}demo/kitchen-sink.html`}>kitchen sink</a>.
+      </p>
+      <slot />
+    </article>
+  </div>
+</Page>

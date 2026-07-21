@@ -1,0 +1,39 @@
+---
+import Page from "./Page.astro";
+import { DOC_NAV } from "../nav.mjs";
+
+const { frontmatter, headings } = Astro.props;
+const BASE = import.meta.env.BASE_URL;
+const toc = headings.filter((h) => h.depth === 2);
+---
+
+<Page title={frontmatter.title} description={frontmatter.description} wide>
+  <div class="doc">
+    <nav class="side" aria-label="Docs">
+      {DOC_NAV.map((g) => (
+        <>
+          <h6>{g.group}</h6>
+          <ul>
+            {g.items.map((i) => (
+              <li>
+                <a href={`${BASE}docs/${i.slug}`} aria-current={i.slug === frontmatter.slug ? "page" : undefined}>{i.label}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      ))}
+    </nav>
+
+    <article class="prose">
+      <h1>{frontmatter.title}</h1>
+      <slot />
+    </article>
+
+    {toc.length > 1 && (
+      <nav class="toc" aria-label="On this page">
+        <h6>On this page</h6>
+        <ul>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+      </nav>
+    )}
+  </div>
+</Page>

@@ -1,250 +1,135 @@
 ---
-const BASE = import.meta.env.BASE_URL; // ends with "/"
-const themes = ["auto", "light", "dark", "nord", "dracula", "catppuccin"];
+import Page from "../layouts/Page.astro";
+
+const BASE = import.meta.env.BASE_URL;
 const install = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hikarion-ui/dist/hikarion.min.css">
 <script src="https://cdn.jsdelivr.net/npm/hikarion-ui/dist/hikarion.js" defer></${"script"}>`;
+
+const description =
+  "A class-light CSS framework for semantic HTML. Bare tags look great; ~20 tokens are a theme; a data-* vocabulary adds variants.";
+
+// Marked up for search and answer engines: what the thing is, what it costs,
+// what it runs on. Same facts as the copy below, in a form a crawler can read.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Hikarion UI",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Any",
+  description,
+  url: Astro.site?.href,
+  license: "https://opensource.org/licenses/MIT",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  softwareVersion: "0.1.0",
+  programmingLanguage: "CSS",
+};
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Hikarion UI — tasteful CSS for semantic HTML</title>
-    <meta
-      name="description"
-      content="A class-light CSS framework for semantic HTML. Bare tags look great; ~20 tokens are a theme; a data-* vocabulary adds variants."
-    />
-    <!-- No-FOUC: apply the saved theme before first paint. -->
-    <script is:inline>
-      try { var t = localStorage.getItem("hikarion-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
-    </script>
-    <link rel="stylesheet" href={`${BASE}hikarion.min.css`} />
-    <link rel="stylesheet" href={`${BASE}themes/nord.css`} />
-    <link rel="stylesheet" href={`${BASE}themes/dracula.css`} />
-    <link rel="stylesheet" href={`${BASE}themes/catppuccin.css`} />
-    <script src={`${BASE}hikarion.js`} defer></script>
+<Page title="Tasteful CSS for semantic HTML" description={description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
 
-    <style>
-      body { max-width: 72rem; margin-inline: auto; }
-      .bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); flex-wrap: wrap; }
-      .switch { display: inline-flex; gap: var(--space-1); flex-wrap: wrap; }
-      .switch button[aria-pressed="true"] { color: var(--accent); border-color: color-mix(in oklch, var(--accent) 45%, var(--border)); }
-      .hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); margin-block: var(--space-6) var(--space-4); }
-      .hero p.lede { font-size: 1.25rem; color: var(--muted); max-width: 44ch; }
-      .grid { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
-      .row { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center; }
-      .play { display: grid; gap: var(--space-7); grid-template-columns: minmax(0, 20rem) 1fr; align-items: start; }
-      @media (max-width: 48rem) { .play { grid-template-columns: 1fr; } }
-      .play label { display: flex; justify-content: space-between; }
-      .play output { color: var(--accent); font-variant-numeric: tabular-nums; }
-      .swatches { display: flex; gap: var(--space-2); }
-      .swatch { inline-size: 2rem; block-size: 2rem; border-radius: var(--radius-sm); border: 1px solid var(--line); }
-      footer { color: var(--muted); border-top: 1px solid var(--line); margin-block-start: var(--space-8); padding-block: var(--space-7); }
-    </style>
-  </head>
+  <section class="hero">
+    <span data-badge data-variant="accent">v0.1 · class-light CSS</span>
+    <h1>Bare HTML, quietly tasteful.</h1>
+    <p class="lede">
+      A class-light CSS framework for semantic HTML. Bare tags look great with
+      no classes; a small <code>data-*</code> vocabulary adds variants; a
+      <code>data-theme</code> container re-lights the whole page — shadows and
+      all — from ~20 tokens.
+    </p>
+    <div class="row" style="margin-block-start:var(--space-6)">
+      <a href={`${BASE}docs/installation`}><button data-variant="solid">Get started</button></a>
+      <button onclick="Hikarion.toast('Copied the install snippet', {variant:'success'}); navigator.clipboard?.writeText(document.getElementById('snippet').innerText)">Copy install</button>
+      <a href="https://github.com/pghqdev/HikarionUI"><button>GitHub</button></a>
+    </div>
+    <pre style="margin-block-start:var(--space-6)"><code id="snippet">{install}</code></pre>
+  </section>
 
-  <body>
-    <header class="bar">
-      <strong style="font-size:1.1rem">Hikarion<span style="color:var(--accent)">UI</span></strong>
-      <nav class="switch">
-        {themes.map((t) => <button data-set-theme={t}>{t[0].toUpperCase() + t.slice(1)}</button>)}
-      </nav>
-    </header>
+  <h2>Components</h2>
+  <p>Every element below is bare semantic HTML — the only attributes are Hikarion's <code>data-*</code> hooks. Switch the theme above; it all re-lights. The <a href={`${BASE}components`}>full reference</a> has the rest.</p>
 
-    <section class="hero">
-      <span data-badge data-variant="accent">v0.1 · class-light CSS</span>
-      <h1>Bare HTML, quietly tasteful.</h1>
-      <p class="lede">
-        A class-light CSS framework for semantic HTML. Bare tags look great with
-        no classes; a small <code>data-*</code> vocabulary adds variants; a
-        <code>data-theme</code> container re-lights the whole page — shadows and
-        all — from ~20 tokens.
-      </p>
-      <div class="row" style="margin-block-start:var(--space-6)">
-        <button data-variant="solid" onclick="Hikarion.toast('Copied the install snippet', {variant:'success'}); navigator.clipboard?.writeText(document.getElementById('snippet').innerText)">Copy install</button>
-        <a href="https://github.com/pghqdev/HikarionUI"><button>GitHub</button></a>
+  <div class="grid">
+    <article>
+      <h3>Buttons</h3>
+      <div class="row">
+        <button>Default</button>
+        <button data-variant="solid">Primary</button>
+        <button data-variant="danger solid">Delete</button>
       </div>
-      <pre style="margin-block-start:var(--space-6)"><code id="snippet">{install}</code></pre>
-    </section>
+    </article>
 
-    <h2>Components</h2>
-    <p>Every element below is bare semantic HTML — the only attributes are Hikarion's <code>data-*</code> hooks. Switch the theme above; it all re-lights.</p>
-
-    <div class="grid">
-      <article>
-        <h3>Buttons</h3>
-        <div class="row">
-          <button>Default</button>
-          <button data-variant="solid">Primary</button>
-          <button data-variant="danger solid">Delete</button>
-        </div>
-      </article>
-
-      <article>
-        <h3>Badges &amp; chips</h3>
-        <div class="row">
-          <span data-badge>Neutral</span>
-          <span data-badge data-variant="success">Passing</span>
-          <span data-badge data-variant="danger solid">3 errors</span>
-        </div>
-        <div class="row" style="margin-block-start:var(--space-4)">
-          <button data-chip aria-pressed="true">All</button>
-          <button data-chip aria-pressed="false">Open</button>
-          <span data-chip>filter.css <button data-chip-remove aria-label="Remove">✕</button></span>
-        </div>
-      </article>
-
-      <article>
-        <h3>Form</h3>
-        <label for="email">Email</label>
-        <input id="email" type="email" required placeholder="you@example.com" />
-        <p><small>Type an invalid address and blur — native <code>:user-invalid</code>.</small></p>
-      </article>
-
-      <article>
-        <h3>Dropdown</h3>
-        <button popovertarget="menu">Actions</button>
-        <div id="menu" popover data-menu>
-          <button>Edit</button>
-          <a href="#">Share</a>
-          <hr />
-          <button>Delete</button>
-        </div>
-      </article>
-    </div>
-
-    <div role="status" data-variant="success" style="margin-block-start:var(--space-6)"><strong>Saved</strong> — every status colour is Tier-1 and passes 4.5:1 contrast in every theme.</div>
-
-    <details style="margin-block-start:var(--space-6)">
-      <summary>What does Hikarion deliberately not do?</summary>
-      <p>No utility classes, no JS framework, no build step for you. It styles pages you own; it yields to any pre-existing site CSS by design.</p>
-    </details>
-
-    <h2>Token playground</h2>
-    <p>It's all 19 Tier-1 variables. Drag three of them and watch the whole page recompute — the spacing scale, the radius scale and the accent-tinted shadows are all derived, never set. The hue slider keeps the current theme's lightness and chroma and moves only the hue, which is what a theme swap does too.</p>
-
-    <div class="play">
-      <div>
-        <h5>Density</h5>
-        <nav class="switch" aria-label="Density">
-          <button data-set-density="crisp" aria-pressed="true">Crisp</button>
-          <button data-set-density="compact" aria-pressed="false">Compact</button>
-        </nav>
-        <p><small>Two values, nestable like <code>data-theme</code>, pure CSS. It tightens chrome — padding, control size, control type — and deliberately leaves headings, body copy and the switch's 24px target alone.</small></p>
-
-        <p>
-          <label for="hue">Accent hue <output id="hue-val">258</output></label>
-          <input id="hue" type="range" min="0" max="360" value="258" />
-        </p>
-        <p>
-          <label for="radius">Radius <output id="radius-val">0.875rem</output></label>
-          <input id="radius" type="range" min="0" max="1.75" step="0.0625" value="0.875" />
-        </p>
-        <p>
-          <label for="space">Space <output id="space-val">0.5rem</output></label>
-          <input id="space" type="range" min="0.3" max="0.9" step="0.05" value="0.5" />
-        </p>
-        <div class="swatches" aria-hidden="true">
-          <span class="swatch" style="background:var(--accent)"></span>
-          <span class="swatch" style="background:var(--surface)"></span>
-          <span class="swatch" style="background:var(--success)"></span>
-          <span class="swatch" style="background:var(--danger)"></span>
-        </div>
-        <p><button id="reset" style="margin-block-start:var(--space-4)">Reset</button></p>
+    <article>
+      <h3>Badges &amp; chips</h3>
+      <div class="row">
+        <span data-badge>Neutral</span>
+        <span data-badge data-variant="success">Passing</span>
+        <span data-badge data-variant="danger solid">3 errors</span>
       </div>
+      <div class="row" style="margin-block-start:var(--space-4)">
+        <button data-chip aria-pressed="true">All</button>
+        <button data-chip aria-pressed="false">Open</button>
+        <span data-chip>filter.css <button data-chip-remove aria-label="Remove">✕</button></span>
+      </div>
+    </article>
 
-      <article>
-        <span data-badge data-variant="accent">Live preview</span>
-        <h3>Everything derives</h3>
-        <p>This card, its radius, its accent-tinted shadow, and the button below all read from the three tokens on the left.</p>
-        <div class="row">
-          <button data-variant="solid">Accent</button>
-          <button>Quiet</button>
-        </div>
-        <div role="alert" data-variant="danger" style="margin-block-start:var(--space-4)"><strong>Danger</strong> — tint recolours with the hue.</div>
-      </article>
-    </div>
+    <article>
+      <h3>Form</h3>
+      <label for="email">Email</label>
+      <input id="email" type="email" required placeholder="you@example.com" />
+      <p><small>Type an invalid address and blur — native <code>:user-invalid</code>.</small></p>
+    </article>
 
-    <h2>Docs</h2>
-    <p>The component reference is the same file coding agents are given, so the two can't drift.</p>
+    <article>
+      <h3>Dropdown</h3>
+      <button popovertarget="menu">Actions</button>
+      <div id="menu" popover data-menu>
+        <button>Edit</button>
+        <a href="#">Share</a>
+        <hr />
+        <button>Delete</button>
+      </div>
+    </article>
+  </div>
 
-    <div class="grid">
-      <article>
-        <h3><a href="https://github.com/pghqdev/HikarionUI/blob/main/rules/hikarion-rules.md">Component reference</a></h3>
-        <p>Every hook, its markup contract, usage and accessibility notes. Canonical — <code>llms.txt</code>, the consumer <code>AGENTS.md</code> and the agent Skill all derive from it.</p>
-      </article>
-      <article>
-        <h3><a href="https://github.com/pghqdev/HikarionUI/blob/main/docs/tokens.md">Tokens &amp; density</a></h3>
-        <p>All 19 Tier-1 tokens, every derived token and its formula, and exactly what Compact does and doesn't move.</p>
-      </article>
-      <article>
-        <h3><a href="https://github.com/pghqdev/HikarionUI/blob/main/docs/overrides.md">Overrides &amp; adoption</a></h3>
-        <p>Customising without fighting <code>@layer</code>: unlayered CSS always wins, no <code>!important</code>. Plus shipping a theme and migrating an existing codebase.</p>
-      </article>
-      <article>
-        <h3><a href="https://github.com/pghqdev/HikarionUI/blob/main/docs/browser-support.md">Browser support</a></h3>
-        <p>Modern-first, graceful fallback. What you get when anchor positioning, container queries or scroll-driven animations aren't there.</p>
-      </article>
-      <article>
-        <h3><a href="https://github.com/pghqdev/HikarionUI/blob/main/docs/accessibility.md">Accessibility</a></h3>
-        <p>Keyboard audit, ARIA contracts, user preferences, and what genuinely degrades with JavaScript off.</p>
-      </article>
-      <article>
-        <h3><a href="https://github.com/pghqdev/HikarionUI/blob/main/docs/public-surface.md">Public surface</a></h3>
-        <p>The frozen contract: what you may depend on, and what's internal and free to change.</p>
-      </article>
-    </div>
+  <div role="status" data-variant="success" style="margin-block-start:var(--space-6)"><strong>Saved</strong> — every status colour is Tier-1 and passes 4.5:1 contrast in every theme.</div>
 
-    <footer>
-      <p>
-        Hikarion UI — <a href="https://github.com/pghqdev/HikarionUI">source</a> ·
-        <a href={`${BASE}llms.txt`}>llms.txt</a> ·
-        <a href={`${BASE}hikarion-rules.md`}>agent rules</a>.
-        Minimalistic. Tasteful. Snappy.
-      </p>
-    </footer>
+  <details style="margin-block-start:var(--space-6)">
+    <summary>What does Hikarion deliberately not do?</summary>
+    <p>No utility classes, no JS framework, no build step for you. It styles pages you own; it yields to any pre-existing site CSS by design.</p>
+  </details>
 
-    <script is:inline>
-      // Token playground: drive three Tier-1 tokens on :root; Tier-2 (spacing,
-      // radius, shadows, tints) re-derives from them, live.
-      const root = document.documentElement;
-      const bind = (id, fmt, apply) => {
-        const el = document.getElementById(id);
-        const out = document.getElementById(id + "-val");
-        el.addEventListener("input", () => { out.textContent = fmt(el.value); apply(el.value); });
-      };
-      // Hue only: drop our own override first, read whatever the active theme's
-      // --accent is, and put its lightness and chroma back with the new hue. A
-      // fixed lightness here would look right in light mode and fail contrast in
-      // dark — the L a theme picks is the part that keeps the accent readable.
-      bind("hue", (v) => v, (v) => {
-        root.style.removeProperty("--accent");
-        const m = getComputedStyle(root).getPropertyValue("--accent").match(/oklch\(\s*([\d.]+%)\s+([\d.]+)/);
-        if (m) root.style.setProperty("--accent", `oklch(${m[1]} ${m[2]} ${v})`);
-      });
-      bind("radius", (v) => `${(+v).toFixed(3).replace(/0+$/, "").replace(/\.$/, "")}rem`, (v) => root.style.setProperty("--radius", `${v}rem`));
-      bind("space", (v) => `${v}rem`, (v) => root.style.setProperty("--space", `${v}rem`));
-      // Density is a plain attribute on a container — no framework JS behind it.
-      // Wrapped in a View Transition where the browser has one; identical without.
-      for (const btn of document.querySelectorAll("[data-set-density]")) {
-        btn.addEventListener("click", () => {
-          const apply = () => {
-            root.dataset.density = btn.dataset.setDensity;
-            for (const b of document.querySelectorAll("[data-set-density]"))
-              b.setAttribute("aria-pressed", String(b === btn));
-          };
-          document.startViewTransition ? document.startViewTransition(apply) : apply();
-        });
-      }
+  <h2>Start here</h2>
+  <div class="grid">
+    <article>
+      <h3><a href={`${BASE}docs/installation`}>Installation</a></h3>
+      <p>One <code>&lt;link&gt;</code>, or one <code>bun add</code>. No build step, no config.</p>
+    </article>
+    <article>
+      <h3><a href={`${BASE}components`}>Component reference</a></h3>
+      <p>Every hook, its markup contract, usage and accessibility notes — the same file coding agents are given.</p>
+    </article>
+    <article>
+      <h3><a href={`${BASE}playground`}>Playground</a></h3>
+      <p>Drag three Tier-1 tokens and watch the spacing, radius and shadow scales re-derive live.</p>
+    </article>
+    <article>
+      <h3><a href={`${BASE}examples`}>Examples</a></h3>
+      <p>A dashboard, a settings page and an auth screen, built only from documented vocabulary.</p>
+    </article>
+    <article>
+      <h3><a href={`${BASE}docs/theming`}>Theming</a></h3>
+      <p>Nineteen custom properties are a theme. Everything else derives.</p>
+    </article>
+    <article>
+      <h3><a href={`${BASE}agents`}>For agents</a></h3>
+      <p><code>llms.txt</code>, the rules file, an installable skill, and a markup validator.</p>
+    </article>
+  </div>
 
-      document.getElementById("reset").addEventListener("click", () => {
-        ["--accent", "--radius", "--space"].forEach((p) => root.style.removeProperty(p));
-        for (const [id, v] of [["hue", 258], ["radius", 0.875], ["space", 0.5]]) {
-          document.getElementById(id).value = v;
-          document.getElementById(id + "-val").textContent = id === "hue" ? v : `${v}rem`;
-        }
-      });
-    </script>
-  </body>
-</html>
+  <style>
+    .hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); margin-block: var(--space-6) var(--space-4); }
+    .hero p.lede { font-size: 1.25rem; color: var(--muted); max-width: 44ch; }
+  </style>
+</Page>

@@ -1,0 +1,69 @@
+---
+import Page from "../layouts/Page.astro";
+
+const BASE = import.meta.env.BASE_URL;
+const RAW = "https://raw.githubusercontent.com/pghqdev/HikarionUI/main/";
+---
+
+<Page
+  title="For coding agents"
+  description="Hikarion ships its vocabulary as llms.txt, an AGENTS.md rules file, an installable Claude Code skill and a markup validator, so agents generate on-vocabulary HTML instead of utility-class slop."
+>
+  <h1>For coding agents</h1>
+  <p class="lede">
+    Hikarion exists partly because coding agents generate utility-class slop by
+    default. So the vocabulary ships in the formats agents actually read — all
+    generated from one canonical file, so they cannot drift.
+  </p>
+
+  <h2>One file, four shapes</h2>
+  <div class="grid">
+    <article>
+      <h3><a href={`${BASE}components`}>hikarion-rules.md</a></h3>
+      <p>The canonical source. Every hook, its markup contract, its accessibility notes, and the rules about what <em>not</em> to write. Everything below is generated from it.</p>
+      <p><small><a href={`${BASE}hikarion-rules.md`}>Raw markdown ↗</a></small></p>
+    </article>
+    <article>
+      <h3><a href={`${BASE}llms.txt`}>llms.txt</a></h3>
+      <p>Served at the site root, the conventional path an agent probes for machine-readable project context.</p>
+    </article>
+    <article>
+      <h3>AGENTS.md</h3>
+      <p>Drop the rules file in your repo as <code>AGENTS.md</code> and any agent that reads the convention inherits the vocabulary for the whole project.</p>
+    </article>
+    <article>
+      <h3><a href={`${BASE}skills.sh`}>Claude Code skill</a></h3>
+      <p>One-line install of a skill whose body is the rules file, fetched live from <code>main</code>.</p>
+    </article>
+  </div>
+
+  <h2>Install</h2>
+  <p>Project scope, into <code>./.claude</code>:</p>
+  <pre><code>curl -fsSL {RAW}skills.sh | sh</code></pre>
+  <p>Or user-wide, into <code>~/.claude</code>:</p>
+  <pre><code>curl -fsSL {RAW}skills.sh | sh -s -- --global</code></pre>
+  <p>Prefer the plain convention? Fetch the same content as <code>AGENTS.md</code>:</p>
+  <pre><code>curl -o AGENTS.md {RAW}rules/hikarion-rules.md</code></pre>
+
+  <h2>Check what the agent wrote</h2>
+  <p>
+    The vocabulary is closed, which makes it checkable. <code>bun run check:markup</code>
+    derives the legal hook set from the frozen
+    <a href={`${BASE}docs/public-surface`}>public surface</a> table and flags any
+    <code>data-*</code> attribute or utility-class pattern that is not in it — so
+    off-vocabulary output fails a build instead of shipping.
+  </p>
+
+  <h2>Copyable compositions</h2>
+  <p>
+    The <a href={`${BASE}examples`}>examples</a> are reference compositions built
+    only from documented vocabulary and covered by the accessibility gate. Point
+    an agent at them for a dashboard, a settings page or an auth screen and it
+    has a correct starting shape rather than an invented one.
+  </p>
+
+  <style>
+    .lede { color: var(--muted); max-width: 62ch; }
+    h2 { margin-block-start: var(--space-7); }
+  </style>
+</Page>

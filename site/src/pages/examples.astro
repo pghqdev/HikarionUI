@@ -1,0 +1,66 @@
+---
+import Page from "../layouts/Page.astro";
+
+const BASE = import.meta.env.BASE_URL;
+const examples = [
+  {
+    file: "dashboard.html",
+    title: "Dashboard",
+    blurb: "Sidebar nav, stat cards, a compact data table and a toast. The table region runs at compact density inside an otherwise crisp page.",
+  },
+  {
+    file: "settings.html",
+    title: "Settings",
+    blurb: "Form layout helpers, switches, a segmented control and a danger zone — the layout vocabulary doing real work.",
+  },
+  {
+    file: "auth.html",
+    title: "Sign in",
+    blurb: "A single crisp card. Native validation, no JavaScript at all.",
+  },
+  {
+    file: "kitchen-sink.html",
+    title: "Kitchen sink",
+    blurb: "Every component on one page. This is the living baseline the visual-regression and axe gates run against.",
+  },
+];
+---
+
+<Page
+  title="Examples"
+  description="Reference compositions — dashboard, settings, auth and the kitchen sink — built only from Hikarion's documented vocabulary."
+>
+  <h1>Examples</h1>
+  <p class="lede">
+    Complete pages built only from documented vocabulary — no bespoke classes,
+    no utilities. They run in the accessibility gate alongside the kitchen sink,
+    so what you copy is what is tested. Agents can fetch the markup directly.
+  </p>
+
+  {examples.map((e) => (
+    <section>
+      <div class="bar">
+        <h2 id={e.file.replace(".html", "")}>{e.title}</h2>
+        <p class="row">
+          <a href={`${BASE}demo/${e.file}`}><button>Open full page ↗</button></a>
+          <a href={`https://github.com/pghqdev/HikarionUI/blob/main/${e.file === "kitchen-sink.html" ? "" : "compositions/"}${e.file}`}><button>View source ↗</button></a>
+        </p>
+      </div>
+      <p>{e.blurb}</p>
+      <iframe src={`${BASE}demo/${e.file}`} title={`${e.title} example`} loading="lazy"></iframe>
+    </section>
+  ))}
+
+  <style>
+    .lede { color: var(--muted); max-width: 62ch; }
+    section { margin-block-start: var(--space-7); }
+    iframe {
+      inline-size: 100%;
+      block-size: 40rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--bg);
+      resize: vertical;
+    }
+  </style>
+</Page>

@@ -6,6 +6,9 @@ import { defineConfig } from "astro/config";
 // BASE_PATH lets the Pages workflow deploy under a project subpath
 // (/HikarionUI/) while a custom-domain deploy uses the default root ("/").
 export default defineConfig({
+  // Absolute origin for canonical URLs, Open Graph and the sitemap. SITE_URL
+  // overrides it for a custom domain, the same way BASE_PATH overrides the base.
+  site: process.env.SITE_URL || "https://pghqdev.github.io",
   base: process.env.BASE_PATH || "/",
   build: { inlineStylesheets: "never" },
 });
