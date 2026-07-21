@@ -37,6 +37,11 @@
    group plus that file's [popovertarget] chevron and [data-menu] panel. Every
    rule here is scoped under [data-button-group], so no tie exists. */
 @import "components/button-group.css";
+/* Must follow dropdown.css, and this one IS a cascade tie: the palette shares
+   that file's row grammar at equal specificity, so the geometry here (a padded
+   input, a scrolling listbox, the aria-selected highlight) only wins on source
+   order. */
+@import "components/palette.css";
 @import "components/tooltip.css";
 @import "components/toast.css";
 @import "components/alert.css";

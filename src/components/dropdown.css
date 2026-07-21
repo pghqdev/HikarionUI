@@ -78,8 +78,12 @@
 
   /* Menu rows — bare <button>/<a> as flat, full-width items. Button chrome is
      shed by the shared quiet-control reset (base/elements.css); the transparent
-     background here covers the <a> case. */
-  [data-menu] :is(button, a) {
+     background here covers the <a> case.
+
+     [data-palette] is named alongside [data-menu] through the whole row grammar:
+     a command-palette row IS a menu row, and the two drifting apart would be the
+     bug. Only the panel geometry differs, and that lives in palette.css. */
+  :is([data-menu], [data-palette]) :is(button, a) {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -94,12 +98,12 @@
     background: transparent;
     border-radius: var(--radius-xs);
   }
-  [data-menu] :is(button, a):hover {
+  :is([data-menu], [data-palette]) :is(button, a):hover {
     background: var(--hover);
   }
 
   /* Separator between groups of rows. */
-  [data-menu] hr {
+  :is([data-menu], [data-palette]) hr {
     margin-block: calc(0.3rem * var(--_density));
     margin-inline: 0;
     border: none;
@@ -108,23 +112,23 @@
 
   /* The focus ring is the only navigation cue in a Tab-driven menu, so keep it
      whole: the global 2px outward offset would straddle the panel's border. */
-  [data-menu] :is(button, a):focus-visible {
+  :is([data-menu], [data-palette]) :is(button, a):focus-visible {
     outline-offset: -2px;
   }
 
   /* Destructive row — reads --_tone-ink from the resolver, the same AA-safe
      mix badges and alerts use, so it clears contrast on --surface with no
      bespoke colour. A `solid` fill inside a menu is a button, not a row. */
-  [data-menu] :is(button, a)[data-variant]:not([data-variant~="solid"]) {
+  :is([data-menu], [data-palette]) :is(button, a)[data-variant]:not([data-variant~="solid"]) {
     color: var(--_tone-ink);
   }
-  [data-menu] :is(button, a)[data-variant]:not([data-variant~="solid"]):hover {
+  :is([data-menu], [data-palette]) :is(button, a)[data-variant]:not([data-variant~="solid"]):hover {
     background: var(--_tint-bg);
   }
 
   /* Inert row — dim and pointer-inert, still focusable and announced. Same
      0.5 as the pagination ends, for the same legibility reason. */
-  [data-menu] [aria-disabled="true"] {
+  :is([data-menu], [data-palette]) [aria-disabled="true"] {
     color: var(--muted);
     opacity: 0.5;
     cursor: not-allowed;
@@ -132,7 +136,7 @@
   }
 
   /* Shortcut hint trails the label; <kbd> chrome comes from elements.css. */
-  [data-menu] :is(button, a) > kbd {
+  :is([data-menu], [data-palette]) :is(button, a) > kbd {
     margin-inline-start: auto;
     color: var(--muted);
   }

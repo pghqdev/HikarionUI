@@ -75,5 +75,29 @@
     :is([role="alert"], [role="status"])[data-variant~="solid"] {
       border-color: CanvasText;
     }
+
+    /* Command palette — the only component whose active row is not the focused
+       element: focus stays in the input while ↑/↓ moves aria-selected, so the
+       highlight IS the cursor. A forced palette repaints --hover to Canvas and
+       it disappears entirely, leaving no way to see which command Enter runs. */
+    dialog[data-palette] [role="option"][aria-selected="true"] {
+      background: Highlight;
+      color: HighlightText;
+    }
+    /* The same row's <kbd> and its toned ink both carry their own colour, which
+       would survive as an unreadable pair on Highlight. */
+    dialog[data-palette] [role="option"][aria-selected="true"] :is(kbd, *) {
+      color: HighlightText;
+      background: transparent;
+      border-color: HighlightText;
+    }
+
+    /* The palette's search field trades its focus ring for a tinted underline,
+       and forced colours repaint every border to the same system colour — so
+       the permanently-focused control in a modal would show no focus at all. */
+    dialog[data-palette] input:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
   }
 }

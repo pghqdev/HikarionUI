@@ -12,6 +12,15 @@ Public surface and deprecation rules: [`docs/versioning.md`](docs/versioning.md)
 
 ### Added
 
+- **`data-palette`** — command palette on a modal `<dialog>`: a search field and
+  a list of commands, opened with the native `command="show-modal"` invoker so
+  `Esc`, the backdrop, the focus trap and focus return stay the browser's. Rows
+  are exactly menu rows (`data-variant`, `aria-disabled`, trailing `<kbd>`,
+  `<hr>`), so nothing new was invented for them. `hikarion.js` adds substring
+  filtering and the APG combobox keys — `↑`/`↓` walk the visible rows and wrap,
+  `Enter` runs the active one, focus stays in the input and the active row is
+  named by `aria-activedescendant`. Without the script every command is still
+  listed, readable and clickable
 - Versioning and deprecation policy (`docs/versioning.md`)
 - Enumerated public Tier-1 + `data-*` surface (`docs/public-surface.md`)
 - Visual regression gate — `kitchen-sink.html` snapshotted across the generated
@@ -210,6 +219,11 @@ so they are additive too.
   commands are feature-detected separately from the Popover API
 
 ### Fixed
+
+- `[hidden]` is honoured again on any component that sets `display`. The UA
+  rule is specificity 0,1,0, so `[data-empty] { display: flex }` silently beat
+  it and `el.hidden = true` stopped hiding an empty state. The reset now carries
+  a doubled-specificity `[hidden][hidden]`, still unlayered-author-overridable
 
 - **`prefers-contrast: more` now reaches consumer themes** — the `--muted`/`--border`
   retune ships unlayered. Inside `@layer hikarion` it was silently dead for any

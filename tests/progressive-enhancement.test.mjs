@@ -298,3 +298,131 @@ describe("toast stack stays reachable", () => {
     });
   });
 });
+
+describe("command palette", () => {
+  const open = async (page) => {
+    await page.locator('[commandfor="ks-palette"]').first().click();
+    await page.waitForFunction(() => document.getElementById("ks-palette")?.open === true);
+  };
+
+  test("typing filters the rows and Enter runs the active one", async () => {
+    await withPage({}, async (page) => {
+      await open(page);
+      const rows = page.locator("#ks-palette [role='option']");
+      const total = await rows.count();
+      expect(total).toBeGreaterThan(2);
+
+      await page.keyboard.type("set");
+      const visible = page.locator("#ks-palette [role='option']:not([hidden])");
+      const shown = await visible.count();
+      expect(shown).toBeGreaterThan(0);
+      expect(shown).toBeLessThan(total);
+      for (const r of await visible.all()) {
+        expect((await r.textContent()).toLowerCase()).toContain("set");
+      }
+
+      // The input keeps DOM focus; the active row is named by aria-activedescendant.
+      const input = page.locator("#ks-palette input");
+      expect(await input.evaluate((el) => el === document.activeElement)).toBe(true);
+      const active = await input.getAttribute("aria-activedescendant");
+      expect(active).toBeTruthy();
+      expect(await page.locator(`#${active}`).getAttribute("aria-selected")).toBe("true");
+
+      await page.keyboard.press("Enter");
+      await page.waitForFunction(() => document.getElementById("ks-palette")?.open === false);
+    });
+  });
+
+  test("ArrowDown walks only the visible rows and wraps", async () => {
+    await withPage({}, async (page) => {
+      await open(page);
+      await page.keyboard.type("s");
+      const input = page.locator("#ks-palette input");
+      const idOf = () => input.getAttribute("aria-activedescendant");
+
+      const seen = [await idOf()];
+      const visible = await page.locator("#ks-palette [role='option']:not([hidden])").count();
+      for (let i = 1; i < visible; i++) {
+        await page.keyboard.press("ArrowDown");
+        seen.push(await idOf());
+      }
+      expect(new Set(seen).size).toBe(visible);          // never lands on a hidden row
+      await page.keyboard.press("ArrowDown");
+      expect(await idOf()).toBe(seen[0]);                 // wraps to the top
+    });
+  });
+
+  test("a query matching nothing shows the empty state", async () => {
+    await withPage({}, async (page) => {
+      await open(page);
+      await page.keyboard.type("zzzzzz");
+      expect(await page.locator("#ks-palette [role='option']:not([hidden])").count()).toBe(0);
+      expect(await page.locator("#ks-palette [data-empty]").isVisible()).toBe(true);
+    });
+  });
+
+  test("without hikarion.js every command is still readable and reachable", async () => {
+    // PE contract: filtering is the enhancement, the command list is the feature.
+    await withPage({ blockHikarionJs: true }, async (page) => {
+      await open(page);
+      const rows = page.locator("#ks-palette :is(button, a)");
+      expect(await rows.count()).toBeGreaterThan(2);
+      for (const r of await rows.all()) expect(await r.isVisible()).toBe(true);
+      expect(await page.locator("#ks-palette [data-empty]").isVisible()).toBe(false);
+    });
+  });
+});
+
+describe("palette regressions", () => {
+  const open = async (page) => {
+    await page.locator('[commandfor="ks-palette"]').first().click();
+    await page.waitForFunction(() => document.getElementById("ks-palette")?.open === true);
+  };
+
+  test("a separator needs a visible row on both sides, not just after", async () => {
+    // Looking only forward left the <hr> stranded as the first visible thing in
+    // the list whenever the query matched nothing above it.
+    await withPage({}, async (page) => {
+      await open(page);
+      await page.keyboard.type("delete");
+      const first = await page.evaluate(() => {
+        const kids = [...document.querySelector("#ks-palette [role=listbox]").children];
+        return (kids.find((e) => !e.hidden) || {}).tagName;
+      });
+      expect(first).not.toBe("HR");
+    });
+  });
+
+  test("rows injected after init() are adopted by the next init()", async () => {
+    // The stamping loop sat behind the bind-once guard, so a late row had no id
+    // for aria-activedescendant, no role for the highlight, and tabIndex 0 —
+    // a stray tab stop inside a modal.
+    await withPage({}, async (page) => {
+      await open(page);
+      const row = await page.evaluate(() => {
+        const d = document.getElementById("ks-palette");
+        d.querySelector("[role=listbox]").insertAdjacentHTML("beforeend", "<button>Deploy to production</button>");
+        window.Hikarion.init(d);
+        const el = d.querySelector("[role=listbox] button:last-of-type");
+        return { role: el.getAttribute("role"), hasId: !!el.id, tabIndex: el.tabIndex };
+      });
+      expect(row).toEqual({ role: "option", hasId: true, tabIndex: -1 });
+    });
+  });
+
+  test('hidden="until-found" stays findable', async () => {
+    // The reset's [hidden][hidden] rule outranks the UA sheet, which exempts
+    // until-found precisely so find-in-page can reveal it. Collapsing it to
+    // display:none makes the content permanently unreachable.
+    await withPage({}, async (page) => {
+      const display = await page.evaluate(() => {
+        const d = document.body.appendChild(document.createElement("div"));
+        d.setAttribute("hidden", "until-found");
+        const shown = getComputedStyle(d).display;
+        d.remove();
+        return shown;
+      });
+      expect(display).not.toBe("none");
+    });
+  });
+});

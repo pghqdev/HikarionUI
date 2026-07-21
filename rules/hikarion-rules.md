@@ -349,6 +349,47 @@ and focus return all keep working, and no JavaScript positions anything. Where
 the Popover API is missing entirely, the panel drops into flow as an inline
 panel under its trigger.
 
+### Command palette
+`[data-palette]` on a modal `<dialog>` makes a command palette: a search
+`<input>` flush at the top edge, then a list of commands. Open it with the
+native invoker — `command="show-modal" commandfor="…"`. `Esc`, the backdrop, the
+focus trap and focus return are the browser's; nothing is bound for them.
+
+```html
+<button command="show-modal" commandfor="palette">Search <kbd>⌘K</kbd></button>
+
+<dialog id="palette" data-palette aria-label="Command palette">
+  <input type="search" placeholder="Type a command…" aria-label="Search commands">
+  <div>
+    <button>Open file <kbd>⌘O</kbd></button>
+    <a href="/docs">Go to documentation</a>
+    <button aria-disabled="true">Publish (needs an account)</button>
+    <hr>
+    <button data-variant="danger">Delete project</button>
+  </div>
+  <p data-empty hidden>No commands match.</p>
+</dialog>
+```
+
+The structure is fixed and positional: the `<input>` first, then one element
+holding the rows, then an optional `[data-empty]` carrying the `hidden`
+attribute. Rows are exactly menu rows — `data-variant` inks a destructive one,
+`aria-disabled` makes one inert-but-announced, a trailing `<kbd>` is a shortcut
+hint, `<hr>` separates groups. Do not put `data-menu` on the list: that hook
+means *popover panel*, and this list is a listbox inside a dialog.
+
+`hikarion.js` supplies the filtering and the keys: typing narrows the list by
+substring, `↑`/`↓` walk the visible rows and wrap, `Enter` runs the active one.
+Focus stays in the input the whole time — the active row is named with
+`aria-activedescendant` and marked with `aria-selected`, which is also what the
+highlight is drawn from. Inert rows are walked but refuse to fire.
+
+Without the script the dialog still opens and every command is visible,
+readable and clickable — the list is the feature, filtering is the enhancement.
+The `[data-empty]` element stays hidden, because nothing can filter it into
+view. Keep the command list short enough to read unfiltered, and it degrades to
+a perfectly good menu.
+
 ### Button group / split button
 `[data-button-group]` fuses adjacent `<button>`s into one control — squared
 seams, rounded outer corners, one hairline where two borders meet. Children must

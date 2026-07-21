@@ -308,10 +308,10 @@ a permanent, documented limitation; use the popover shape when dismissal matters
 
 **Blocked by:** Accessibility & progressive-enhancement contract for the existing set; Menu (context & action)
 
-- [ ] Dialog + listbox (or equivalent) pattern is usable from the keyboard
-- [ ] Vocabulary stays closed and consistent with dialog/menu
-- [ ] Kitchen-sink demo exists
-- [ ] Agent rules document the composition
+- [x] Dialog + listbox (or equivalent) pattern is usable from the keyboard
+- [x] Vocabulary stays closed and consistent with dialog/menu
+- [x] Kitchen-sink demo exists
+- [x] Agent rules document the composition
 
 ## Agent reference compositions + markup validation
 
@@ -438,6 +438,8 @@ state. The last box is left for a human look at the rendered kitchen sink._
 - [x] Visual regression + contrast cover both modes across the set
 - [x] Agent rules and docs describe density as native, not optional polish
 - [x] No component looks “comfortable default with compact squeezed on”
+
+_Command palette shipped, so the last blocker component is in: re-audited with it and it needs no density work of its own — the rows are menu rows and ride that scale, and the dialog's own chrome is the only new box._
 
 _Audited component by component. Two components were the “squeezed on” tell and were fixed: `<label>` and `thead th` were hard-sized, so Compact shrank the field and the cells while leaving their label and header band at full size. Everything else either sits on the density scale or states in its header why it is invariant (`badge`, `switch`, `skeleton`, `spinner`, type, elevation). Target-size measured in a browser, not assumed: nothing crosses the 24px floor going Crisp → Compact. Re-open when Command palette ships — it is the one blocker component still missing, and it will need the same pass._
 

@@ -38,9 +38,9 @@ Generated for **v0.1.0** by `bun scripts/cdn-docs.mjs` (part of `bun run build`)
 
 | File | `integrity` |
 |------|-------------|
-| `dist/hikarion.min.css` | `sha384-txm8Ak54/x5jlXrpGOf6IICIfuXItUrRHqgs2mu/ZhcneSG1Qh2RolGMaeuGtoJ+` |
-| `dist/hikarion.css` | `sha384-maVZkqUJDJbNXn8+qlTDaZm7Jjl1H8hvcAU1/Qsw0/H9Yw6ykGaU+23OETc5ZR08` |
-| `dist/hikarion.js` | `sha384-B0ylKzLNbSKJF0c5GfrdYHXdxTJSsl2uYxZEOUcR5kz9zuxCDlqnQHvclD5EYNKF` |
+| `dist/hikarion.min.css` | `sha384-H9EqkiydnpipJYr3gr07iLrg2nkqITMjpe52LRwsWHdstEMjBRD487sQOljFlLFx` |
+| `dist/hikarion.css` | `sha384-r4pn7en0nWny2fi9CM8jY4DzXKjK0WQ9c+5Q7ZmDxWxYbUIynOCv57clZ6mybQhp` |
+| `dist/hikarion.js` | `sha384-Izz30opAStRPoUVTCV+pSWmbh4IekPmyAtAxtLa4Ao/BcwPxEdN0h5AqQb61J5Wa` |
 | `dist/themes/nord.min.css` | `sha384-zWGdcdTuFI+0oUj7gWilGuppC++uwPj6BGRRspchXuLvnERZc8eZRfX0CJOOPKr5` |
 | `dist/themes/dracula.min.css` | `sha384-0nnDtePKlqxirgzDUpCSP/QUB22BNn7T2jTQIRtJYWJs2YywdbDZHxCA05t/6dh2` |
 | `dist/themes/catppuccin.min.css` | `sha384-Ib1CpXG4K/pjKZ8VNwyDiJGB3Beu7uPl/pfZCCy4iOdR8UJLX7cqGU7Gmi5AU1Gi` |

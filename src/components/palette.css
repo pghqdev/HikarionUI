@@ -1,0 +1,80 @@
+/* Command palette — a `<dialog data-palette>` holding a search input and a list
+   of commands. Native modal dialog, so Esc, the backdrop, focus trap and focus
+   return are all the browser's; the pop and scrim come from dialog.css and
+   base/motion.css unchanged.
+
+   The rows are menu rows: `[data-palette]` is named alongside `[data-menu]` in
+   dropdown.css's row grammar rather than restating it here, so a command row, a
+   destructive row (`data-variant="danger"`), an inert row (`aria-disabled`) and
+   a shortcut `<kbd>` all behave exactly as they do in a menu. The list is NOT
+   `[data-menu]` itself: that hook means "popover panel" — hikarion.js stamps
+   role="menu" on it and calls showPopover() — and a palette list is a listbox
+   inside a dialog, neither of which is true.
+
+   No-JS is the reason the vocabulary is this small. Without hikarion.js the
+   dialog still opens (native `command="show-modal"`), and every command is
+   visible, readable and clickable — the list is the feature, filtering is the
+   enhancement. The input simply does nothing, and the empty state stays
+   `hidden` because nothing can filter it into view.
+
+   ponytail: no anchor positioning, no virtual list, no fuzzy matching — a
+   substring match over a list a human wrote. Reach for a matcher when a palette
+   holds enough commands that substring stops finding them. */
+
+@layer hikarion {
+  dialog[data-palette] {
+    /* Wider than a prose dialog and pinned near the top: a palette is reached
+       mid-task and reads as a surface over the page, not a centred interruption.
+       `margin: auto` from dialog.css centres inline; only the block start moves. */
+    inline-size: min(34rem, calc(100vw - var(--space-6)));
+    max-inline-size: none;
+    margin-block-start: 12vh;
+    /* The input sits flush at the top edge and the list scrolls under it, so the
+       padding lives on the parts, never on the shell. */
+    padding: 0;
+    overflow: clip;                       /* clip the list to the rounded corner */
+  }
+
+  dialog[data-palette] input {
+    inline-size: 100%;
+    padding: var(--space-5) var(--space-6);
+    font-size: calc(1rem * var(--_density-type));
+    color: var(--fg);
+    background: none;
+    border: none;
+    border-radius: 0;
+    border-block-end: 1px solid var(--line);
+  }
+  /* The dialog border already frames the field; a second ring inside it reads as
+     a box in a box. The caret and the border-block-end carry the focus. */
+  dialog[data-palette] input:focus-visible {
+    outline: none;
+    border-block-end-color: var(--accent);
+  }
+  dialog[data-palette] input::-webkit-search-cancel-button { display: none; }
+
+  /* The listbox. Capped so a long command set scrolls instead of growing the
+     dialog past the viewport; `overscroll-behavior` keeps the page still once
+     the list bottoms out. */
+  dialog[data-palette] [role="listbox"],
+  dialog[data-palette] > div {
+    max-block-size: min(24rem, 50vh);
+    padding: calc(0.3rem * var(--_density));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Keyboard focus stays in the input, so the active row is marked by
+     aria-selected, not :focus — the highlight has to be drawn from that. It is
+     the same fill the menu uses for hover, which is the point: one idea of
+     "the row under the cursor", whether the cursor is a mouse or the ↓ key. */
+  dialog[data-palette] [role="option"][aria-selected="true"] {
+    background: var(--hover);
+  }
+
+  /* Empty state — [data-empty] unchanged from empty.css, only its box. The
+     `hidden` attribute is what toggles it, so no-JS never shows it. */
+  dialog[data-palette] [data-empty] {
+    padding-block: var(--space-7);
+  }
+}

@@ -52,6 +52,21 @@
     text-wrap: pretty;
   }
 
+  /* The UA sheet's `[hidden] { display: none }` is specificity 0,1,0, so any
+     component rule that sets `display` on the same element silently defeats it
+     and `el.hidden = true` stops hiding anything — [data-empty] hit exactly
+     this. Doubled here so it outranks a single-attribute component rule.
+     Deliberately NOT !important: an unlayered author rule must still be able to
+     show a [hidden] element, which is the whole point of @layer hikarion.
+
+     The `until-found` exclusion is the UA sheet's and must be kept: that value
+     is `content-visibility: hidden`, not `display: none`, precisely so
+     find-in-page can reveal the element and fire `beforematch`. Collapsing it
+     to `display: none` would make the content unfindable. */
+  [hidden][hidden]:not([hidden="until-found" i]) {
+    display: none;
+  }
+
   /* Accessibility: honour reduced-motion above everything, including author
      transitions. !important is deliberate here. */
   @media (prefers-reduced-motion: reduce) {

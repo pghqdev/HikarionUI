@@ -89,6 +89,7 @@ grammar, not a separate attribute.
 | `data-tab-list` | Tab list container |
 | `data-tab-panel` | Tab panel |
 | `data-menu` | Dropdown / action menu (with native `popover`) |
+| `data-palette` | Command palette on a modal `<dialog>`: a search field plus a list of commands. Rows are menu rows |
 | `data-button-group` | Adjacent `<button>`s fused into one control; a `[popovertarget]` half makes it a split button |
 | `data-nav` | Primary navigation run (`top`, the spelled-out default, or `sidebar` for the vertical rail) |
 | `data-table` | Scroll frame + sticky header around a data `<table>` |

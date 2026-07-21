@@ -65,6 +65,62 @@ for (const density of ["crisp", "compact"]) {
   }
 }
 
+// Closed overlays are not in the accessibility tree, so every pass above is
+// blind to them: a dialog, menu or palette could ship any amount of invalid
+// ARIA and the gate would stay green. It did — the command palette's listbox
+// owned an <hr>, which only surfaced when the dialog was opened by hand. Open
+// each one and scan while it is actually on screen.
+for (const density of ["crisp", "compact"]) {
+  await page.evaluate((d) => (document.documentElement.dataset.density = d), density);
+  // Opening invokers only. A `command="close"`/`hide-popover` button lives
+  // *inside* its overlay, so it is not visible until something else opens it —
+  // clicking it first just hangs. Same for a trigger nested in a closed overlay.
+  const triggers = await page.evaluate(() => {
+    const opens = /^(show-modal|show-popover|toggle-popover)$/;
+    return [...document.querySelectorAll("[popovertarget], [commandfor]")]
+      .filter((el) => el.hasAttribute("popovertarget") || opens.test(el.getAttribute("command") || ""))
+      .filter((el) => el.checkVisibility?.() !== false)
+      .map((el, i) => {
+        el.dataset.hkA11yProbe = String(i);
+        return { i: String(i), target: el.getAttribute("popovertarget") || el.getAttribute("commandfor") };
+      });
+  });
+
+  for (const { i, target } of triggers) {
+    await page.click(`[data-hk-a11y-probe="${i}"]`);
+    // Entrances are neutralised by reducedMotion, but the open still lands a
+    // frame later; sampling early reads a half-faded overlay as a contrast fail.
+    await page.waitForTimeout(120);
+    const open = await page.evaluate((id) => {
+      const el = document.getElementById(id);
+      return !!el && (el.matches(":popover-open") || /** @type {HTMLDialogElement} */ (el).open === true);
+    }, target);
+    if (!open) continue;                 // an invoker whose target this browser cannot open
+
+    const res = await new AxeBuilder({ page })
+      .options({ rules: { "target-size": { enabled: true } } })
+      .include(`#${target}`)
+      .analyze();
+    if (res.violations.length) {
+      failed = true;
+      console.error(`✗ axe-core (${density}, #${target} open): ${res.violations.length} violation group(s)`);
+      for (const v of res.violations) {
+        console.error(`\n${v.id} (${v.impact}): ${v.help}`);
+        for (const node of v.nodes.slice(0, 5)) {
+          console.error(`  - ${node.target.join(" ")}`);
+          if (node.failureSummary) console.error(`    ${node.failureSummary.split("\n")[0]}`);
+        }
+      }
+    }
+    await page.keyboard.press("Escape");
+    await page.evaluate(() => {
+      document.querySelectorAll("dialog[open]").forEach((d) => d.close());
+      document.querySelectorAll(":popover-open").forEach((p) => p.hidePopover());
+    });
+  }
+  console.log(`✓ axe-core: ${triggers.length} overlay(s) scanned open (${density})`);
+}
+
 // The reference compositions are the pages agents copy, so an a11y defect in one
 // propagates. One pass each, no density loop: dashboard and settings carry a
 // [data-density="compact"] region inline, and the density mechanism itself is

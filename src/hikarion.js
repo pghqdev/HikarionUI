@@ -462,6 +462,132 @@
     }
   }
 
+  // --- Command palette: filter a [data-palette] dialog's command list as the
+  // user types, and drive it from the keyboard.
+  //
+  // The APG combobox shape, not a menu: DOM focus never leaves the input (you
+  // are still typing), so the active row is named by aria-activedescendant and
+  // marked with aria-selected — which is also the only thing palette.css has to
+  // draw the highlight from. Rows are role="option" in a role="listbox".
+  //
+  // Filtering is the enhancement and the list is the feature: with this script
+  // absent every command is still visible, readable and clickable, and the
+  // empty state stays `hidden` because nothing can filter it into view.
+  // ponytail: substring match, no fuzzy scoring. A palette a human typed the
+  // commands into is not a search index.
+  function palette(dialog) {
+    const input = dialog.querySelector("input");
+    const list = dialog.querySelector("[role=listbox]") ?? input?.nextElementSibling;
+    if (!input || !list) return;
+
+    const group = "hkPaletteId" in dialog.dataset ? dialog.dataset.hkPaletteId : (dialog.dataset.hkPaletteId = String(uid++));
+    list.setAttribute("role", "listbox");
+    if (!list.id) list.id = `hk-palette-list-${group}`;
+    // A listbox announces as a bare "list box" without one, and the dialog's own
+    // label does not reach it.
+    if (!list.hasAttribute("aria-label") && !list.hasAttribute("aria-labelledby"))
+      list.setAttribute("aria-label", input.getAttribute("aria-label") || "Results");
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-controls", list.id);
+    input.setAttribute("aria-expanded", "true");
+    // Tells AT that typing narrows the list, which is the whole interaction.
+    input.setAttribute("aria-autocomplete", "list");
+    input.setAttribute("autocomplete", "off");
+    const empty = dialog.querySelector("[data-empty]");
+
+    const rows = () => [...list.querySelectorAll("button, a")];
+    // Stamped on every visit, not just the first: init() is the documented way
+    // to adopt injected rows, and an unstamped row has no id for
+    // aria-activedescendant to name, no role for the highlight to match, and a
+    // default tabIndex that makes it a stray tab stop inside the modal.
+    rows().forEach((row, i) => {
+      row.setAttribute("role", "option");
+      if (!row.id) row.id = `hk-palette-${group}-${i}`;
+      // A row is not a tab stop: ↑/↓ from the input is the whole navigation
+      // model, and Tab must leave the palette rather than walk 40 commands.
+      row.tabIndex = -1;
+    });
+    // role="listbox" may own only options and groups, so the decorative rules
+    // have to leave the tree. Stamped here, not asked of the author: the role
+    // that makes them invalid is one this function added.
+    list.querySelectorAll("hr").forEach((hr) => hr.setAttribute("role", "presentation"));
+
+    if ("hkPalette" in dialog.dataset) return;   // listeners bind once
+    dialog.dataset.hkPalette = "";
+
+    // Inert rows stay in the walk. `aria-disabled` means announced-but-inert
+    // everywhere else in the system (dropdown.css, pagination), so skipping
+    // them here would hide from a keyboard user a command a mouse user can see.
+    // Enter refuses to fire them instead.
+    const shown = () => rows().filter((r) => !r.hidden);
+    // `scroll` is false on the pointer path: scrolling a row into view moves a
+    // different row under a stationary cursor, whose pointermove then selects
+    // it — the list walks itself.
+    const select = (row, scroll = true) => {
+      if (row && row.getAttribute("aria-selected") === "true") return;
+      rows().forEach((r) => r.setAttribute("aria-selected", String(r === row)));
+      if (!row) return void input.removeAttribute("aria-activedescendant");
+      input.setAttribute("aria-activedescendant", row.id);
+      if (scroll) row.scrollIntoView({ block: "nearest" });
+    };
+
+    const filter = () => {
+      const q = input.value.trim().toLowerCase();
+      for (const row of rows()) row.hidden = q !== "" && !row.textContent.toLowerCase().includes(q);
+      // A separator needs a visible row on BOTH sides. Looking only forward
+      // leaves it stranded as the first visible thing in the list whenever the
+      // query matches nothing above it.
+      const liveSide = (hr, dir) => {
+        let el = hr[dir];
+        while (el && el.tagName !== "HR") {
+          if (el.matches("button, a") && !el.hidden) return true;
+          el = el[dir];
+        }
+        return false;
+      };
+      for (const hr of list.querySelectorAll("hr"))
+        hr.hidden = !(liveSide(hr, "nextElementSibling") && liveSide(hr, "previousElementSibling"));
+      const visible = shown();
+      if (empty) empty.hidden = visible.length > 0;
+      select(visible[0]);
+    };
+
+    input.addEventListener("input", filter);
+    input.addEventListener("keydown", (e) => {
+      const visible = shown();
+      if (e.key === "Enter") {
+        // The first visible row is preselected from the moment the palette
+        // opens, so Enter on an untouched palette runs it — that is the point
+        // of a palette, not an accident. Enter with nothing matched does
+        // nothing, and an inert row refuses to fire.
+        const active = visible.find((r) => r.getAttribute("aria-selected") === "true");
+        if (!active || active.getAttribute("aria-disabled") === "true") return;
+        e.preventDefault();
+        active.click();
+        return;
+      }
+      const step = { ArrowDown: 1, ArrowUp: -1 }[e.key];
+      if (!step || !visible.length) return;
+      e.preventDefault();
+      const i = visible.findIndex((r) => r.getAttribute("aria-selected") === "true");
+      select(visible[(i + step + visible.length) % visible.length]);
+    });
+
+    // Pointer and keyboard must agree on which row is active, or hovering one
+    // row and pressing Enter runs another.
+    list.addEventListener("pointermove", (e) => {
+      const row = e.target.closest?.("button, a");
+      if (row && !row.hidden) select(row, false);
+    });
+    // A command that ran is done: close the dialog so the page is usable again.
+    list.addEventListener("click", (e) => {
+      if (e.target.closest?.("button, a")) dialog.close();
+    });
+    // Reopening starts fresh — a stale query from last time reads as a bug.
+    dialog.addEventListener("close", () => { input.value = ""; filter(); });
+    filter();
+  }
+
   // --- Init: wire the per-element helpers inside `root`. Idempotent, so call
   // it again on any container you've injected markup into. ---
   /** @param {ParentNode} [root] */
@@ -470,6 +596,7 @@
     q("pre").forEach(decorate);
     q("[data-tabs]").forEach(tabs);
     q("[data-menu]").forEach(menu);
+    q("dialog[data-palette]").forEach(palette);
     q("[data-set-theme]").forEach(themeControl);
     reflect();
   }

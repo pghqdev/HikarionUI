@@ -1081,6 +1081,34 @@
       not draw a position it does not know.</p>
     <pre><code>&lt;div data-scroll-progress aria-hidden="true"&gt;&lt;/div&gt;</code></pre>
 
+    <h2>Command palette</h2>
+    <p>A native modal <code>&lt;dialog data-palette&gt;</code> holding a search field and a
+      list of commands. Esc, the backdrop, the focus trap and focus return are the
+      browser's. Rows are the <em>same</em> rows as the action menu — a destructive row is
+      <code>data-variant="danger"</code>, an inert one is <code>aria-disabled</code>, a
+      shortcut is a real <code>&lt;kbd&gt;</code> — so nothing new was invented for them.
+      With <code>hikarion.js</code> the field filters as you type and ↑/↓/Enter drive the
+      list, keeping focus in the input and marking the active row with
+      <code>aria-selected</code>. Without the script every command is still listed,
+      readable and clickable: the list is the feature, filtering is the enhancement.</p>
+    <div class="row">
+      <button command="show-modal" commandfor="ks-palette">Search commands <kbd>⌘K</kbd></button>
+    </div>
+    <dialog id="ks-palette" data-palette aria-label="Command palette">
+      <input type="search" placeholder="Type a command…" aria-label="Search commands">
+      <div>
+        <button>Open file <kbd>⌘O</kbd></button>
+        <button>Save file <kbd>⌘S</kbd></button>
+        <button>Open settings <kbd>⌘,</kbd></button>
+        <button>Toggle sidebar</button>
+        <a href="#">Go to documentation</a>
+        <button aria-disabled="true">Publish (needs a signed-in account)</button>
+        <hr>
+        <button data-variant="danger">Delete this project</button>
+      </div>
+      <p data-empty hidden>No commands match that search.</p>
+    </dialog>
+
     <h2>Code</h2>
     <p>Hover a code block for the copy button (from <code>hikarion.js</code>).</p>
     <pre><code>&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hikarion-ui/dist/hikarion.min.css"&gt;
