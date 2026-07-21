@@ -40,11 +40,9 @@ const jsonLd = {
       all — from ~20 tokens.
     </p>
     <div class="row" style="margin-block-start:var(--space-6)">
-      <!-- Links, not buttons in links: Hikarion has no documented
-           link-that-looks-like-a-button, and nesting one is invalid HTML. -->
-      <a href={`${BASE}docs/installation`}>Get started →</a>
+      <a href={`${BASE}docs/installation`} data-button data-variant="solid">Get started</a>
       <button onclick="Hikarion.toast('Copied the install snippet', {variant:'success'}); navigator.clipboard?.writeText(document.getElementById('snippet').innerText)">Copy install</button>
-      <a href="https://github.com/pghqdev/HikarionUI">GitHub ↗</a>
+      <a href="https://github.com/pghqdev/HikarionUI" data-button>GitHub</a>
     </div>
     <pre style="margin-block-start:var(--space-6)"><code id="snippet">{install}</code></pre>
   </section>

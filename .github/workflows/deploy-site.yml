@@ -24,9 +24,12 @@ jobs:
         run: bun install && bun run check && bun run build
       - name: Build site
         working-directory: site
-        # Project Pages serve at /<repo>/; a custom domain would set BASE_PATH=/.
+        # Custom domain (site/public/CNAME), so the site is at an origin root:
+        # BASE_PATH stays "/" and robots.txt / canonicals resolve. Reverting to
+        # project Pages means BASE_PATH=/HikarionUI/ and SITE_URL to match.
         env:
-          BASE_PATH: /HikarionUI/
+          BASE_PATH: /
+          SITE_URL: https://hikarion.dev
         run: bun install && bun run sync-assets.mjs && bun run build
       - uses: actions/upload-pages-artifact@v3
         with:

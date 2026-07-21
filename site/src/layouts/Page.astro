@@ -5,6 +5,8 @@ const { title, description, wide = false } = Astro.props;
 const BASE = import.meta.env.BASE_URL; // ends with "/"
 const themes = ["auto", "light", "dark", "nord", "dracula", "catppuccin"];
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
+// Crawlers do not resolve relative og:image, so this one has to be absolute.
+const ogImage = Astro.site ? new URL(`${BASE}og.png`, Astro.site).href : `${BASE}og.png`;
 const here = Astro.url.pathname.slice(BASE.length);
 const active = (t) => (t.match ? here.startsWith(t.match) : here.replace(/\/$/, "") === t.href);
 const full = `${title} — Hikarion UI`;
@@ -23,7 +25,11 @@ const full = `${title} — Hikarion UI`;
     <meta property="og:title" content={full} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Hikarion UI — bare HTML, quietly tasteful." />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="color-scheme" content="light dark" />
     <link rel="alternate" type="text/plain" href={`${BASE}llms.txt`} title="llms.txt" />
     <!-- No-FOUC: apply the saved theme before first paint. -->
@@ -61,6 +67,20 @@ const full = `${title} — Hikarion UI`;
       .doc nav a:hover { color: var(--fg); }
       .doc nav a[aria-current="page"] { color: var(--accent); }
       .prose { max-width: 44rem; }
+      /* Live example above its snippet. Contained, because the examples include
+         overlays and sticky things that would otherwise escape into the page. */
+      [data-preview] {
+        contain: paint;
+        border: 1px solid var(--line);
+        border-radius: var(--radius) var(--radius) 0 0;
+        border-block-end: none;
+        padding: var(--space-6);
+        background: var(--bg);
+        overflow-x: auto;
+      }
+      [data-preview] + pre { border-start-start-radius: 0; border-start-end-radius: 0; }
+      [data-preview] > :first-child { margin-block-start: 0; }
+      [data-preview] > :last-child { margin-block-end: 0; }
       .prose table { display: block; overflow-x: auto; }
       @media (max-width: 64rem) {
         .doc, .doc[data-cols="2"] { grid-template-columns: 1fr; }

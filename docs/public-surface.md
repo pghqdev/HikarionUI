@@ -80,6 +80,7 @@ grammar, not a separate attribute.
 
 | Hook | Role |
 |------|------|
+| `data-button` | A link that is a main action: `<a data-button>` takes the button's shape. Composes with `data-variant` |
 | `data-badge` | Badge |
 | `data-avatar` | Avatar (image or initials) |
 | `data-avatar-group` | Overlapping avatar stack |

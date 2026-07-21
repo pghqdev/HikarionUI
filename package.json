@@ -49,6 +49,7 @@
   },
   "scripts": {
     "build": "mkdir -p dist && (cd dist && lightningcss --bundle --sourcemap ../src/hikarion.css -o hikarion.css && lightningcss --bundle --minify --sourcemap ../src/hikarion.css -o hikarion.min.css) && cp src/hikarion.js dist/hikarion.js && bun scripts/build-themes.mjs && bun scripts/build-rules.mjs && bun scripts/cdn-docs.mjs",
+    "build:og": "bun scripts/og-image.mjs",
     "build:rules": "bun scripts/build-rules.mjs",
     "build:themes": "bun scripts/build-themes.mjs",
     "check": "bun scripts/contrast-check.mjs",

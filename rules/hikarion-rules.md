@@ -48,6 +48,18 @@ tone over its background. Omit `data-variant` for the neutral default.
 Buttons take a tone **only** with `solid`; there is no soft toned button.
 Reserve the one solid primary for a view's single main action.
 
+When the main action is a **navigation**, it is still a link — give it the
+button's shape with `data-button` rather than wrapping a `<button>` in an `<a>`,
+which is invalid HTML and loses the link's middle-click, copy and open-in-tab
+behaviour.
+```html
+<a href="/docs/installation" data-button data-variant="solid">Get started</a>
+<a href="https://github.com/…" data-button>GitHub</a>
+```
+Only for navigation. If it does something on this page it is a `<button>`, and
+if it is prose it is a plain link — `data-button` on ordinary body links is the
+same clutter as a utility class.
+
 ### Card
 ```html
 <article>

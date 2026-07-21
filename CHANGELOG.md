@@ -12,6 +12,12 @@ Public surface and deprecation rules: [`docs/versioning.md`](docs/versioning.md)
 
 ### Added
 
+- **`data-button`** — `<a data-button>` gives a link the button's shape, for a
+  main action that navigates. `data-variant` composes exactly as it does on a
+  `<button>`. Added because the alternative people reach for — a `<button>`
+  nested in an `<a>` — is invalid HTML and loses middle-click, copy-link and
+  open-in-new-tab. Navigation only; `[data-button-group]` still addresses
+  `> button`
 - **`data-palette`** — command palette on a modal `<dialog>`: a search field and
   a list of commands, opened with the native `command="show-modal"` invoker so
   `Esc`, the backdrop, the focus trap and focus return stay the browser's. Rows

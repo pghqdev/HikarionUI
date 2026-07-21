@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "bun run sync-assets.mjs",
-    "dev": "bun run sync-assets.mjs && astro dev",
+    "prebuild": "bun run sync-assets.mjs && bun ../scripts/og-image.mjs",
+    "dev": "bun run sync-assets.mjs && bun ../scripts/og-image.mjs && astro dev",
     "build": "astro build",
     "preview": "astro preview"
   },

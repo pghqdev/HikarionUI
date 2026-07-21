@@ -36,6 +36,17 @@ export const DOC_NAV = [
       { slug: "browser-support", label: "Browser support" },
     ],
   },
+  {
+    // Maintainer-facing, but published: "read the source on GitHub" is a worse
+    // answer than a page, and these are the docs that say how the project
+    // holds itself to its own contract.
+    group: "Project",
+    items: [
+      { slug: "production-readiness", label: "Production readiness" },
+      { slug: "visual-regression", label: "Visual regression" },
+      { slug: "rfc", label: "RFC process" },
+    ],
+  },
 ];
 
 export const DOC_SLUGS = DOC_NAV.flatMap((g) => g.items.map((i) => i.slug));

@@ -24,6 +24,9 @@ cpSync(from("dist/themes"), to("themes"), { recursive: true });
 cpSync(from("dist/llms.txt"), to("llms.txt"));
 cpSync(from("dist/hikarion-rules.md"), to("hikarion-rules.md"));
 cpSync(from("skills.sh"), to("skills.sh"));
+// GitHub Pages reads the custom domain from a CNAME file in the artifact.
+// Generated rather than committed because public/ is entirely generated.
+writeFileSync(to("CNAME"), "hikarion.dev\n");
 
 // Live demos are served as standalone documents inside an iframe, so they keep
 // their own <head> and the site chrome stays out of the way.
@@ -67,10 +70,35 @@ const relink = (md, depth, dir) => {
     });
 };
 
+// Attributes that point at an id. Every markup example is rendered live on the
+// same page, so ids have to be made unique per example or the browser resolves
+// a label, a popover invoker or aria-controls to the wrong element.
+const ID_ATTRS = ["id", "for", "list", "form", "headers", "popovertarget", "commandfor",
+  "aria-controls", "aria-labelledby", "aria-describedby", "aria-activedescendant"];
+
+// Render each ```html example above its own code block. The markup in the
+// rules file is the contract, so the preview cannot drift from the snippet —
+// it *is* the snippet.
+const withPreviews = (md) => {
+  let n = 0;
+  return md.replace(/^```html\n([\s\S]*?)^```$/gm, (fence, code) => {
+    const suffix = `-ex${++n}`;
+    const live = code.replace(
+      new RegExp(`\\b(${ID_ATTRS.join("|")})="([^"]+)"`, "g"),
+      (m, attr, val) => `${attr}="${val.split(/\s+/).map((v) => v + suffix).join(" ")}"`,
+    )
+      // The examples navigate to illustrative paths (/install, /tokens) that
+      // are not routes here. Only the preview copy is defanged; the code block
+      // below it still shows what the snippet actually says.
+      .replace(/href="(?!#)[^"]*"/g, 'href="#"');
+    return `<div data-preview>\n\n${live}\n</div>\n\n${fence}`;
+  });
+};
+
 // Turn a repo doc into an Astro page: strip the H1 (the layout renders it as
 // the page title), and rewrite sibling `./foo.md` links to the site's routes.
-const publish = (src, dest, layout, depth, dir, extra = {}) => {
-  let md = readFileSync(src, "utf8");
+const publish = (src, dest, layout, depth, dir, extra = {}, transform = (s) => s) => {
+  let md = transform(readFileSync(src, "utf8"));
   const title = md.match(/^#\s+(.+)$/m)?.[1] ?? dest;
   md = md.replace(/^#\s+.+\n+/, "");
   const description = md.match(/^(?!\[|#|>|\||```)(\S.+(?:\n\S.+)*)/m)?.[1]
@@ -91,8 +119,7 @@ mkdirSync(page("docs"), { recursive: true });
 for (const slug of DOC_SLUGS) {
   publish(from(`docs/${slug}.md`), page(`docs/${slug}.md`), "../../layouts/Doc.astro", 2, "docs/", { slug });
 }
-publish(from("rules/hikarion-rules.md"), page("components.md"), "../layouts/Reference.astro", 1, "rules/", {
-  title: "Component reference",
-});
+publish(from("rules/hikarion-rules.md"), page("components.md"), "../layouts/Reference.astro", 1, "rules/",
+  { title: "Component reference" }, withPreviews);
 
 console.log(`✓ synced framework + demos + ${DOC_SLUGS.length} docs → site/`);

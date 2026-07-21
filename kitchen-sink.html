@@ -263,6 +263,12 @@
       <button disabled>Disabled</button>
       <button class="overridden">Author override wins</button>
     </div>
+    <p>A main action that navigates stays a link: <code>&lt;a data-button&gt;</code>
+      takes the shape without nesting a button inside an anchor.</p>
+    <div class="row">
+      <a href="#buttons" data-button data-variant="solid">Get started</a>
+      <a href="#buttons" data-button>Read the docs</a>
+    </div>
 
     <h2>Dialog</h2>
     <p>Native <code>&lt;dialog&gt;</code>, opened as a modal. Open/close ride the

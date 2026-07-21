@@ -211,10 +211,17 @@
   }
 
   /* --- Buttons --- */
+  /* `<a data-button>` is a link that carries a button's affordance — a
+     navigation that is the main action of a view. It is an explicit hook, not
+     bare `<a data-variant>`, so a toned link in prose can never become a
+     button by accident. `data-variant` composes exactly as it does on a
+     button; `[data-button-group]` does not — it addresses `> button` and is
+     for controls, not navigation. */
   button,
   input[type="button"],
   input[type="submit"],
-  input[type="reset"] {
+  input[type="reset"],
+  a[data-button] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -235,17 +242,22 @@
                 box-shadow var(--dur) var(--ease-hikarion),
                 transform var(--dur) var(--ease-hikarion);
   }
+  a[data-button] {
+    text-decoration: none;
+  }
   button:hover,
   input[type="button"]:hover,
   input[type="submit"]:hover,
-  input[type="reset"]:hover {
+  input[type="reset"]:hover,
+  a[data-button]:hover {
     background: var(--hover);
     border-color: color-mix(in oklch, var(--fg) 22%, var(--border));
   }
   button:active,
   input[type="button"]:active,
   input[type="submit"]:active,
-  input[type="reset"]:active {
+  input[type="reset"]:active,
+  a[data-button]:active {
     background: var(--surface-2);
     box-shadow: none;
     transform: scale(0.985);
@@ -264,21 +276,21 @@
      action (base/tone.css). Buttons consume tone only when solid; there is no
      soft toned button. :where keeps the default at zero specificity so the
      resolver's tone words win. */
-  :where(button, input[type="button"], input[type="submit"], input[type="reset"]) {
+  :where(button, input[type="button"], input[type="submit"], input[type="reset"], a[data-button]) {
     --_tone: var(--accent);
     --_tone-content: var(--accent-content);
   }
-  :is(button, input[type="button"], input[type="submit"], input[type="reset"])[data-variant~="solid"] {
+  :is(button, input[type="button"], input[type="submit"], input[type="reset"], a[data-button])[data-variant~="solid"] {
     color: var(--_tone-content);
     background: var(--_tone);
     border-color: transparent;
     box-shadow: none;
   }
-  :is(button, input[type="button"], input[type="submit"], input[type="reset"])[data-variant~="solid"]:hover {
+  :is(button, input[type="button"], input[type="submit"], input[type="reset"], a[data-button])[data-variant~="solid"]:hover {
     background: var(--_tone-hover);
     border-color: transparent;
   }
-  :is(button, input[type="button"], input[type="submit"], input[type="reset"])[data-variant~="solid"]:active {
+  :is(button, input[type="button"], input[type="submit"], input[type="reset"], a[data-button])[data-variant~="solid"]:active {
     background: var(--_tone-hover);
   }
 
