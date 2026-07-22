@@ -69,8 +69,9 @@ const jsonLd = {
       <div class="row" style="margin-block-start:var(--space-4)">
         <button data-chip aria-pressed="true">All</button>
         <button data-chip aria-pressed="false">Open</button>
-        <span data-chip>filter.css <button data-chip-remove aria-label="Remove">✕</button></span>
+        <span data-chip>label: bug <button data-chip-remove aria-label="Remove filter">✕</button></span>
       </div>
+      <p><small>Chips toggle; the ✕ removes its chip. Try it.</small></p>
     </article>
 
     <article>
@@ -92,6 +93,25 @@ const jsonLd = {
       <p><small>Native <code>popover</code>: the browser owns open, dismiss and focus.</small></p>
     </article>
   </div>
+
+  <h2>Why this and not Pico, Open Props, or your own CSS?</h2>
+  <p>
+    The theme is the difference: set ~20 tokens and every spacing step, radius,
+    shadow, tint and state colour derives from them — with CI failing any theme
+    whose derived pairs drop below 4.5:1 contrast. Interactive parts lean on the
+    platform (<code>&lt;dialog&gt;</code>, <code>popover</code>,
+    <code>:user-invalid</code>) with an optional 10&nbsp;kB script for what the
+    platform doesn't cover yet. And the whole vocabulary ships as a
+    machine-readable contract, so coding agents write correct markup instead of
+    inventing class names. The honest trade-offs are on
+    <a href={`${BASE}docs/compared`}>the comparison page</a>.
+  </p>
+  <ul>
+    <li>~9 kB gzipped CSS, budget-gated in CI</li>
+    <li>Contrast + axe checks fail the build, not the user</li>
+    <li>Everything in <code>@layer</code> — your unlayered CSS always wins</li>
+    <li>SemVer, changelog, and a <a href={`${BASE}docs/browser-support`}>documented browser floor</a></li>
+  </ul>
 
   <details style="margin-block-start:var(--space-6)">
     <summary>What does Hikarion not do?</summary>
