@@ -311,7 +311,10 @@
   }
 
   /* --- Form fields --- */
-  input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  /* The :not() chain only excludes; :where() keeps it from inflating the
+     selector to (0,8,1), which quietly beat every component that restyles an
+     inner field (palette, input group) at honest specificity. */
+  input:where(:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"])),
   textarea,
   select {
     width: 100%;
@@ -423,7 +426,7 @@
      just hue) so the error state doesn't rely on colour alone. It also overrides
      the accent focus ring when an invalid field is focused. */
   :is(
-    input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+    input:where(:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"])),
     textarea,
     select
   ):is(:user-invalid, [aria-invalid="true"]) {
