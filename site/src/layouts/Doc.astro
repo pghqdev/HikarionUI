@@ -7,7 +7,7 @@ const BASE = import.meta.env.BASE_URL;
 const toc = headings.filter((h) => h.depth === 2);
 ---
 
-<Page title={frontmatter.title} description={frontmatter.description} wide>
+<Page title={frontmatter.title} description={frontmatter.description}>
   <div class="doc" data-cols={toc.length > 1 ? undefined : "2"}>
     <nav class="side" aria-label="Docs">
       {DOC_NAV.map((g) => (

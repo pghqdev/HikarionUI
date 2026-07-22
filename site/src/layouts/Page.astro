@@ -2,7 +2,7 @@
 import { TABS } from "../nav.mjs";
 import { ASSET_V } from "../assets.mjs";
 
-const { title, description, wide = false } = Astro.props;
+const { title, description } = Astro.props;
 const BASE = import.meta.env.BASE_URL; // ends with "/"
 const themes = ["auto", "light", "dark", "nord", "dracula", "catppuccin"];
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
@@ -44,8 +44,10 @@ const full = `${title} — Hikarion UI`;
     <script src={`${BASE}hikarion.js?v=${ASSET_V}`} defer></script>
 
     <style is:global>
+      /* Reserve the scrollbar on every page, so navigating from a short page to
+         a scrolling one does not shift the centred column sideways. */
+      html { scrollbar-gutter: stable; }
       body { max-width: 72rem; margin-inline: auto; }
-      body[data-wide] { max-width: 90rem; }
       .bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); flex-wrap: wrap; }
       .switch { display: inline-flex; gap: var(--space-1); flex-wrap: wrap; }
       .switch button[aria-pressed="true"] { color: var(--accent); border-color: color-mix(in oklch, var(--accent) 45%, var(--border)); }
@@ -58,9 +60,11 @@ const full = `${title} — Hikarion UI`;
       .row { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center; }
       footer { color: var(--muted); border-top: 1px solid var(--line); margin-block-start: var(--space-8); padding-block: var(--space-7); }
 
-      /* Two- or three-column documentation shell: nav rail, prose, on-page ToC. */
-      .doc { display: grid; grid-template-columns: 14rem minmax(0, 1fr) 12rem; gap: var(--space-7); align-items: start; }
-      .doc[data-cols="2"] { grid-template-columns: 16rem minmax(0, 1fr); }
+      /* Two- or three-column documentation shell: nav rail, prose, on-page ToC.
+         Sized to fit the same 72rem body every other page uses — a wider
+         container here would shift the header and tabs on every navigation. */
+      .doc { display: grid; grid-template-columns: 13rem minmax(0, 1fr) 11rem; gap: var(--space-6); align-items: start; }
+      .doc[data-cols="2"] { grid-template-columns: 15rem minmax(0, 1fr); }
       .doc .side, .doc .toc { position: sticky; top: var(--space-5); font-size: 0.9rem; max-block-size: calc(100dvh - var(--space-7)); overflow-y: auto; }
       .doc nav ul { list-style: none; padding: 0; margin: 0 0 var(--space-5); display: grid; gap: var(--space-1); }
       .doc nav h6 { color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.72rem; margin-block: var(--space-4) var(--space-2); }
@@ -92,7 +96,7 @@ const full = `${title} — Hikarion UI`;
     <slot name="head" />
   </head>
 
-  <body data-wide={wide ? "" : undefined}>
+  <body>
     <header class="bar">
       <a href={BASE} style="text-decoration:none"
         ><strong style="font-size:1.1rem">Hikarion<span style="color:var(--accent)">UI</span></strong></a
